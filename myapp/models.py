@@ -20,10 +20,9 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-# 3. Skill model (UPDATED)
+# 3. Skill model 
 class Skill(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    # NEW: Stores the bootstrap icon class (e.g., 'bi-code-slash', 'bi-brush', 'bi-pen')
     # This allows the dashboard to show cool icons for each badge!
     icon_class = models.CharField(max_length=50, default='bi-star-fill', help_text="Bootstrap icon class")
 
@@ -46,14 +45,14 @@ class StudentProfile(models.Model):
     exam_mode = models.BooleanField(default=False)
 
     # Verification Fields
-    # This checks if the student is generally verified (Global verification)
+    # This checks if the student is generally verified (global verification)
     is_skill_verified = models.BooleanField(default=False) 
     skill_assessment_submission = models.FileField(upload_to='assessments/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.university}"
 
-# 5. Posted gigs and jobs (UPDATED)
+# 5. Posted gigs and jobs 
 class Job(models.Model):
     STATUS_CHOICES = (
         ('open', 'Open'),
@@ -65,7 +64,7 @@ class Job(models.Model):
 
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
     
-    # CRITICAL: related_name='assigned_jobs' allows us to use request.user.assigned_jobs in the view
+    #  related_name='assigned_jobs' allows us to use request.user.assigned_jobs in the view
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_jobs')
     
     title = models.CharField(max_length=200)
@@ -80,7 +79,7 @@ class Job(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='review')
     created_at = models.DateTimeField(auto_now_add=True)
     
-    # NEW: Tracks when the job was finished (useful for sorting earnings history)
+    #Tracks when the job was finished (useful for sorting earnings history)
     completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

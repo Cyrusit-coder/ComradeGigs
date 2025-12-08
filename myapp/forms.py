@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User, StudentProfile, Job, Application, Donation, Skill
 
-# --- STUDENT REGISTRATION FORM ---
+# student reg form
 class StudentRegisterForm(UserCreationForm):
     full_name = forms.CharField(max_length=150, help_text="Enter your First and Last name")
     university = forms.CharField(max_length=100)
@@ -10,9 +10,8 @@ class StudentRegisterForm(UserCreationForm):
     year_of_study = forms.IntegerField()
     phone = forms.CharField(max_length=15, label="Phone Number")
     
-    # FIX 1: Skills Selection
-    # queryset=Skill.objects.all() loads "Web Basics", "VA", etc. from your database.
-    # required=False allows the "No Skill" option (leaving it blank).
+#skills selection
+    
     skills = forms.ModelMultipleChoiceField(
         queryset=Skill.objects.all(),
         widget=forms.CheckboxSelectMultiple, 
@@ -23,24 +22,24 @@ class StudentRegisterForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        # We include 'email' and the extra fields defined above
+
         fields = UserCreationForm.Meta.fields + ('email', 'full_name', 'phone')
 
     def save(self, commit=True):
-        # 1. Create the User instance (but don't save to DB yet)
+        
         user = super().save(commit=False)
         user.role = 'student'
         user.phone_number = self.cleaned_data['phone']
         
-        # Optional: Save full_name to first_name for the dashboard greeting
+        
         if 'full_name' in self.cleaned_data:
             user.first_name = self.cleaned_data['full_name']
         
         if commit:
-            # 2. Save User to DB
+            # 2. save User to databae
             user.save()
             
-            # 3. Create Student Profile (WITHOUT skills initially)
+            
             # This prevents the "Direct assignment" TypeError
             profile = StudentProfile.objects.create(
                 user=user,
@@ -57,7 +56,7 @@ class StudentRegisterForm(UserCreationForm):
                 
         return user
 
-# --- OTHER FORMS (Unchanged) ---
+#other forms
 
 class ClientRegisterForm(UserCreationForm):
     email = forms.EmailField()

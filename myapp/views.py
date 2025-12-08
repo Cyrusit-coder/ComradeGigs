@@ -105,22 +105,20 @@ def student_dashboard(request):
     # 1. Get recent applications (Limit to 5)
     apps = request.user.my_applications.all().order_by('-created_at')[:5]
     
-    # 2. Get Active Jobs (Assignments)
-    # Filter for jobs assigned to this user that are 'assigned' (In Progress)
-    # We order by 'deadline' so the most urgent jobs appear at the top of the list
+    # 2. get active jobs (assignments)
+
     active_jobs_list = request.user.assigned_jobs.filter(status='assigned').order_by('deadline')
     
-    # 3. Calculate Total Earnings
-    # Sum the budget of jobs that have been marked 'completed'. 
-    # If you want to show 'Potential Earnings' (current active jobs), change status='completed' to status='assigned'
+    # 3. Calculate total earnings
+    
     earnings_data = request.user.assigned_jobs.filter(status='completed').aggregate(Sum('budget'))
     total_earnings = earnings_data['budget__sum'] or 0
     
     context = {
         'my_apps': apps,
         'active_jobs_count': active_jobs_list.count(),
-        'active_jobs_list': active_jobs_list, # Passing the full list for your "Active Projects" card
-        'total_earnings': total_earnings,     # Passing this for the "Total Earnings" card
+        'active_jobs_list': active_jobs_list, # Passing the full list for your "active projects" card
+        'total_earnings': total_earnings,     # Passing this for the "total earnings" card
     }
     return render(request, 'student/dashboard.html', context)
 def job_list(request):
@@ -262,24 +260,23 @@ def client_dashboard(request):
     
     user = request.user
     
-    # 1. Get the list of jobs (for the "Recent Postings" table)
+    # 1. Get the list of jobs (for the recent postings table)
     jobs = user.posted_jobs.all().order_by('-created_at')
     
-    # --- COUNTER LOGIC ---
     
-    # 2. Count "Active Jobs"
-    # Logic: Jobs that are either live ('open') or currently being done by a student ('assigned')
+    # 2. Count active jobs
+    
     active_jobs_count = jobs.filter(status__in=['open', 'assigned']).count()
     
-    # 3. Count "Applicants Reviewing"
-    # Logic: Applications for *my* jobs that are not yet accepted or rejected
+    # 3. Count applicants reviewing
+    
     applicants_reviewing_count = Application.objects.filter(
         job__client=user, 
         is_accepted=False, 
         is_rejected=False
     ).count()
     
-    # 4. Count "Completed Gigs"
+    # 4. Count completed gigs
     completed_gigs_count = jobs.filter(status='completed').count()
     
     context = {
@@ -292,7 +289,7 @@ def client_dashboard(request):
 
 @login_required
 def job_create(request):
-    # Allow clients OR Superusers to post gigs or jobs the admin verifies
+    # Allow clients or Superusers to post gigs or jobs the admin verifies
     if request.user.role != 'client' and not request.user.is_superuser:
         messages.error(request, "Access Denied. Only Clients can post gigs.")
         return redirect('myapp:home')
@@ -321,6 +318,7 @@ def job_create(request):
     else:
         form = JobForm()
     return render(request, 'client/job_create.html', {'form': form})
+
 @login_required
 def job_edit(request, pk):
     job = get_object_or_404(Job, pk=pk, client=request.user)
@@ -350,22 +348,19 @@ def applicant_review(request, job_id):
 
     return render(request, 'client/applicant_review.html', {'job': job})
 
-# --- DONOR VIEWS ---
-from django.db.models import Sum  # <--- MAKE SURE THIS IMPORT IS AT THE TOP
-
+# donor views
 @login_required
 def donor_dashboard(request):
-    # 1. Get donation history
+    # 1. get donation history
     donations = request.user.donations.all().order_by('-date')
     
-    # 2. Calculate Total Contributed (Sum of only PAID donations)
-    # aggregate returns a dictionary: {'amount__sum': 5000}
+    # 2. Calculate Total Contributed Sum of only paid donations
     total_data = donations.filter(is_paid=True).aggregate(Sum('amount'))
     
-    # If there are no donations, 'amount__sum' will be None, so we verify it with 'or 0'
+    # If there are no donations, amount__sum will be None, so we verify it with 'or 0'
     total_contributed = total_data['amount__sum'] or 0
     
-    # 3. Calculate "Comrades Supported"
+    # 3. Calculate Comrades Supported
     # Logic: assuming roughly Ksh 500 supports one comrade (meal/bundles)
     comrades_supported = int(total_contributed / 500)
     
@@ -402,7 +397,7 @@ def donate_success(request):
         last_donation.save()
     return render(request, 'donor/donate_success.html')
 
-# --- M-PESA CALLBACK ---
+# mpesa callback
 @csrf_exempt
 def mpesa_confirmation(request):
     if request.method == 'POST':
@@ -414,13 +409,13 @@ def mpesa_confirmation(request):
             return HttpResponse(status=400)
     return HttpResponse(status=400)
 
-# --- ADMIN VIEWS ---
+# admin views
 @login_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('myapp:home')
     
-    # --- UPDATED STATS FOR DASHBOARD ---
+    #stats for dashboard
     total_users_count = User.objects.count()
     pending_gigs_count = Job.objects.filter(status='review').count()
     pending_assessments_count = SkillSubmission.objects.filter(status='pending').count()
@@ -431,7 +426,7 @@ def admin_dashboard(request):
         status__in=['open', 'review', 'assigned']
     ).count()
 
-    # NEW: Count pending applications (neither accepted nor rejected)
+    #Count pending applications neither accepted nor rejected
     pending_apps_count = Application.objects.filter(is_accepted=False, is_rejected=False).count()
     
     context = {
@@ -539,7 +534,7 @@ def admin_approve_skill(request, submission_id):
             
     return redirect('myapp:admin_verify_skills')
 
-# --- NEW FUNCTIONS FOR EXPIRED GIGS ---
+# management of expired gigs views
 
 @login_required
 def admin_manage_expired(request):
@@ -565,7 +560,7 @@ def admin_delete_gig(request, job_id):
     
     return redirect('myapp:admin_manage_expired')
 
-# --- NEW FUNCTIONS FOR APPLICATIONS (WORKFLOW) ---
+# application workflow views
 
 @login_required
 def admin_manage_applications(request):
@@ -598,10 +593,10 @@ def admin_process_application(request, app_id):
             
             # 2. Assign the job to this student
             job.assigned_to = application.student
-            job.status = 'assigned' # Change status to In Progress
+            job.status = 'assigned' 
             job.save()
             
-            # 3. Reject other applicants for this same job (Optional but good practice)
+            # 3. Reject other applicants for this same job 
             other_apps = Application.objects.filter(job=job).exclude(id=application.id)
             other_apps.update(is_rejected=True)
             

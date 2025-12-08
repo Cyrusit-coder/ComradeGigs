@@ -4,6 +4,7 @@
 {% block title %}Review Applicants | ComradeGigs{% endblock %}
 
 {% block content %}
+        <!-- applicants review page -->
 <section class="py-5 bg-light">
   <div class="container">
     
@@ -29,7 +30,7 @@
     </div>
 
     <div class="row g-4">
-      
+      <!-- shows all applicants -->
       {% for app in job.applications.all %}
       <div class="col-lg-6">
         <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift">

@@ -4,6 +4,7 @@
 {% block title %}Donate | ComradeGigs{% endblock %}
 
 {% block content %}
+         <!-- donation form -->
 <section class="py-5 bg-light">
   <div class="container">
     <div class="row justify-content-center">
@@ -70,19 +71,19 @@
     </div>
   </div>
 </section>
-
+          <!-- js styling of the interactivity for the donation buttons -->
 <script>
   document.querySelectorAll('.amount-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-      // Remove active class from all
+      
       document.querySelectorAll('.amount-btn').forEach(b => {
         b.classList.remove('btn-success', 'text-white');
         b.classList.add('btn-outline-secondary');
       });
-      // Add active class to clicked
+      
       this.classList.remove('btn-outline-secondary');
       this.classList.add('btn-success', 'text-white');
-      // Set input value
+      
       document.getElementById('amountInput').value = this.dataset.value;
     });
   });
