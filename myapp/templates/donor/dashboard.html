@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Donor Dashboard | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold mb-0">My Impact</h2>
+        <p class="text-secondary mb-0">Thank you for supporting the comrades, <strong>{{ user.username }}</strong>!</p>
+      </div>
+      <a href="{% url 'myapp:donate' %}" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+        <i class="bi bi-heart-fill me-2"></i>Make a Donation
+      </a>
+    </div>
+
+    <div class="row g-4 mb-5">
+      
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background-color: #dc3545;"> <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <p class="mb-1 text-uppercase fw-bold opacity-75 small">Total Contributed</p>
+              
+              <h1 class="fw-bold display-4 mb-2">Ksh {{ total_contributed }}</h1>
+              
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-up-circle-fill"></i>
+                <span class="fw-bold small">You are a Top Donor!</span>
+              </div>
+            </div>
+            <div class="opacity-25">
+              <i class="bi bi-gift-fill" style="font-size: 5rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-4 me-4">
+               <i class="bi bi-people-fill display-6"></i>
+            </div>
+            <div>
+              <h2 class="fw-bold mb-1">{{ comrades_supported }} Comrades Supported</h2>
+              <p class="text-secondary mb-0 small">
+                Your funds have helped pay for meals, internet bundles, and emergency fees.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="card-header bg-white py-3 px-4 border-bottom">
+        <h6 class="fw-bold mb-0">Donation History</h6>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-light">
+            <tr>
+              <th class="py-3 ps-4 text-uppercase small fw-bold text-secondary">Date</th>
+              <th class="py-3 text-uppercase small fw-bold text-secondary">Amount</th>
+              <th class="py-3 text-uppercase small fw-bold text-secondary">Method</th>
+              <th class="py-3 text-uppercase small fw-bold text-secondary">Status</th>
+              <th class="py-3 pe-4 text-end text-uppercase small fw-bold text-secondary">Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for donation in donations %}
+            <tr>
+              <td class="ps-4 fw-bold text-dark">{{ donation.date|date:"M d, Y" }}</td>
+              <td class="fw-bold text-success">Ksh {{ donation.amount }}</td>
+              <td>
+                <span class="badge bg-secondary bg-opacity-10 text-dark border">M-Pesa</span>
+              </td>
+              <td>
+                {% if donation.is_paid %}
+                  <span class="badge bg-success rounded-pill px-3">Completed</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark rounded-pill px-3">Pending</span>
+                {% endif %}
+              </td>
+              <td class="pe-4 text-end">
+                <button class="btn btn-light btn-sm rounded-circle shadow-sm">
+                  <i class="bi bi-download text-secondary"></i>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-5 text-muted">
+                    <i class="bi bi-cash-coin display-4 mb-3 d-block opacity-25"></i>
+                    No donations made yet.
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

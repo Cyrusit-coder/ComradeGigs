@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Users | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-bold mb-0">User Management</h3>
+      <div class="d-flex gap-2">
+        <input type="text" class="form-control rounded-pill border-0 shadow-sm" placeholder="Search username..." style="width: 250px;">
+        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Search</button>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-dark text-white">
+            <tr>
+              <th class="py-3 ps-4">Username</th>
+              <th class="py-3">Role</th>
+              <th class="py-3">Joined</th>
+              <th class="py-3">Status</th>
+              <th class="py-3 text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td class="ps-4">
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 35px; height: 35px;">
+                    {{ user.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark">{{ user.username }}</div>
+                    <div class="small text-muted">{{ user.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if user.role == 'student' %}
+                  <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill">Student</span>
+                {% elif user.role == 'client' %}
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill">Client</span>
+                {% elif user.role == 'donor' %}
+                  <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill">Donor</span>
+                {% endif %}
+              </td>
+              <td class="text-secondary small">{{ user.date_joined|date:"M d, Y" }}</td>
+              <td>
+                {% if user.is_active %}
+                  <span class="badge bg-success rounded-pill">Active</span>
+                {% else %}
+                  <span class="badge bg-secondary rounded-pill">Banned</span>
+                {% endif %}
+              </td>
+              <td class="text-end pe-4">
+                <div class="btn-group">
+                  <a href="#" class="btn btn-sm btn-outline-secondary rounded-start fw-bold">Edit</a>
+                  
+                  <form method="post" action="{% url 'myapp:admin_ban_user' user.id %}" onsubmit="return confirm('Are you sure you want to change this user\'s status?');">
+                    {% csrf_token %}
+                    {% if user.is_active %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-end fw-bold">
+                        <i class="bi bi-slash-circle"></i> Ban
+                      </button>
+                    {% else %}
+                      <button type="submit" class="btn btn-sm btn-success rounded-end fw-bold">
+                        <i class="bi bi-check-circle"></i> Unban
+                      </button>
+                    {% endif %}
+                  </form>
+                  
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="card-footer bg-white py-3">
+        <nav>
+          <ul class="pagination justify-content-center mb-0">
+            <li class="page-item disabled"><a class="page-link rounded-start-pill" href="#">Previous</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link rounded-end-pill" href="#">Next</a></li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Graphic Design Course | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8 text-center">
+        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 mb-3 fw-bold">
+          Skill Module: Graphic Design
+        </span>
+        <h2 class="fw-bolder text-dark mb-3">Design Basics & Assessment</h2>
+        <p class="text-secondary lead fs-6">
+          Read the short guide below, then complete the practical task. 
+          <br><strong>Admin will verify your work before giving you the badge.</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-5">
+          <div class="card-body p-5">
+            <h4 class="fw-bold text-danger mb-4"><i class="bi bi-book-half me-2"></i>Quick Study Guide</h4>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <h6 class="fw-bold">1. Standard Dimensions</h6>
+                <ul class="small text-secondary mb-4">
+                  <li><strong>Instagram Post:</strong> 1080 x 1080 px</li>
+                  <li><strong>Instagram Story:</strong> 1080 x 1920 px</li>
+                  <li><strong>A4 Poster:</strong> 210 x 297 mm</li>
+                </ul>
+                
+                <h6 class="fw-bold">2. Color Contrast</h6>
+                <p class="small text-secondary">
+                  Always ensure text is readable. Dark text on light backgrounds, or light text on dark backgrounds. Avoid yellow text on white!
+                </p>
+              </div>
+              
+              <div class="col-md-6 border-start-md">
+                <h6 class="fw-bold">3. Tools to Use</h6>
+                <p class="small text-secondary">
+                  You don't need Photoshop. Use <strong>Canva</strong> (free version) for most comrade gigs. It has templates for everything.
+                </p>
+
+                <h6 class="fw-bold">4. Deliverables</h6>
+                <p class="small text-secondary">
+                  Clients usually want a <strong>JPG/PNG</strong> for social media and a <strong>PDF</strong> for printing. Always ask before starting.
+                </p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-danger bg-gradient text-white p-4">
+            <h4 class="fw-bold mb-0"><i class="bi bi-pencil-fill me-2"></i>The Practical Test</h4>
+          </div>
+          <div class="card-body p-5">
+            
+            <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
+              <i class="bi bi-exclamation-circle-fill fs-4 me-3"></i>
+              <div>
+                <strong>Task:</strong> Design a simple "Welcome Back Party" poster for a campus event.
+                <br>Make sure to include: <em>Date, Time, Venue, and Entry Fee.</em>
+              </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">1. Paste your Canva/Drive Link (Optional)</label>
+                <input type="url" name="link" class="form-control form-control-lg bg-light border-0" placeholder="https://canva.com/design/...">
+              </div>
+
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">2. Upload your Design (JPG/PNG/PDF)</label>
+                <input type="file" name="file" class="form-control form-control-lg bg-light border-0" required>
+              </div>
+
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">3. Describe your design choice (Short)</label>
+                <textarea name="description" class="form-control bg-light border-0" rows="3" placeholder="I chose these colors because..."></textarea>
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold shadow-sm">
+                  Submit for Verification <i class="bi bi-send-fill ms-2"></i>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

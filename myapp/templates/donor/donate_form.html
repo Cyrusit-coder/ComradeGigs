@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Donate | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-7">
+
+        <div class="text-center mb-4">
+          <div class="d-inline-flex align-items-center justify-content-center bg-white shadow-sm rounded-circle mb-3" style="width: 70px; height: 70px;">
+            <i class="bi bi-heart-fill text-danger fs-2"></i>
+          </div>
+          <h2 class="fw-bold text-dark">Support a Comrade</h2>
+          <p class="text-secondary small">Secure M-Pesa transaction powered by Safaricom.</p>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="bg-success bg-gradient p-2 text-center text-white small fw-bold">
+            <i class="bi bi-shield-lock-fill me-1"></i> Verified Secure Payment
+          </div>
+          
+          <div class="card-body p-4 p-md-5">
+            <form method="post" id="donationForm">
+              {% csrf_token %}
+              
+              <label class="form-label fw-bold small text-secondary">Select Amount</label>
+              <div class="d-flex gap-2 mb-3">
+                <button type="button" class="btn btn-outline-secondary flex-grow-1 rounded-pill fw-bold amount-btn" data-value="500">500</button>
+                <button type="button" class="btn btn-outline-secondary flex-grow-1 rounded-pill fw-bold amount-btn" data-value="1000">1,000</button>
+                <button type="button" class="btn btn-outline-secondary flex-grow-1 rounded-pill fw-bold amount-btn" data-value="2000">2,000</button>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-secondary">Or Enter Amount (Ksh)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 fw-bold text-muted">Ksh</span>
+                  <input type="number" name="amount" id="amountInput" class="form-control bg-light border-start-0 py-2 fw-bold" placeholder="e.g. 150" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-secondary">M-Pesa Phone Number</label>
+                <input type="text" name="phone" value="{{ user.phone_number }}" class="form-control bg-light border-0 py-2" placeholder="0712 345 678" required>
+                <div class="form-text small">The number that will receive the PIN prompt.</div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold small text-secondary">Message (Optional)</label>
+                <textarea name="message" class="form-control bg-light border-0" rows="2" placeholder="Encouragement for the students..."></textarea>
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm hover-lift">
+                  Proceed to Pay <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="{% url 'myapp:donor_dashboard' %}" class="text-decoration-none text-secondary small fw-bold">Cancel Transaction</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.amount-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active class from all
+      document.querySelectorAll('.amount-btn').forEach(b => {
+        b.classList.remove('btn-success', 'text-white');
+        b.classList.add('btn-outline-secondary');
+      });
+      // Add active class to clicked
+      this.classList.remove('btn-outline-secondary');
+      this.classList.add('btn-success', 'text-white');
+      // Set input value
+      document.getElementById('amountInput').value = this.dataset.value;
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Post a Gig | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          
+          <div class="card-header bg-primary bg-gradient text-white p-4">
+            <h4 class="fw-bold mb-0"><i class="bi bi-megaphone-fill me-2"></i>Post a New Gig</h4>
+          </div>
+
+          <div class="card-body p-5">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="form-label fw-bold small text-secondary">Gig Title</label>
+                <input type="text" name="title" class="form-control bg-light border-0 py-3" placeholder="e.g. Need a Logo Design for my Startup" required>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small text-secondary">Budget (Ksh)</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-0">Ksh</span>
+                    <input type="number" name="budget" class="form-control bg-light border-0 py-3" placeholder="1500">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small text-secondary">Deadline</label>
+                  <input type="date" name="deadline" class="form-control bg-light border-0 py-3">
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold small text-secondary">Description & Requirements</label>
+                <textarea name="description" class="form-control bg-light border-0 p-3" rows="6" placeholder="Describe what you need done. Be specific about deliverables." required></textarea>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-5">
+                <a href="{% url 'myapp:client_dashboard' %}" class="text-decoration-none fw-bold text-secondary">Cancel</a>
+                <button type="submit" class="btn btn-warning btn-lg rounded-pill fw-bold shadow-sm px-5">
+                  Publish Gig
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card border-0 bg-white shadow-sm rounded-4 p-4">
+          <h6 class="fw-bold text-primary mb-3">Tips for a Great Post</h6>
+          <ul class="list-unstyled small text-secondary mb-0 d-flex flex-column gap-3">
+            <li class="d-flex"><i class="bi bi-check-circle-fill text-success me-2"></i> <span><strong>Be Specific:</strong> Clear instructions attract better talent.</span></li>
+            <li class="d-flex"><i class="bi bi-check-circle-fill text-success me-2"></i> <span><strong>Fair Budget:</strong> Comrades are skilled. Fair pay gets faster results.</span></li>
+            <li class="d-flex"><i class="bi bi-check-circle-fill text-success me-2"></i> <span><strong>Communication:</strong> Be ready to answer questions once you post.</span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

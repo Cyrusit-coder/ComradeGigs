@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Student Registration | ComradeGigs{% endblock %}
+{% block content %}
+<!-- student regi form -->
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+        
+        <div class="bg-primary bg-gradient p-4 text-center text-white">
+          <h3 class="fw-bold mb-1"><i class="bi bi-mortarboard-fill me-2"></i>Comrade Registration</h3>
+          <p class="small opacity-75 mb-0">Join the alliance. Verify your campus status.</p>
+        </div>
+
+        <div class="card-body p-5">
+          <form method="post" class="row g-4">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="col-12">
+                <div class="alert alert-danger d-flex align-items-center mb-0 rounded-3">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <div>
+                    {% for error in form.non_field_errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+
+            {% for field in form %}
+              <div class="{% if field.name == 'skills' %}col-12{% else %}col-md-6{% endif %}">
+                
+                <label class="form-label fw-bold small text-secondary">{{ field.label }}</label>
+                
+                {% if field.name == 'skills' %}
+                    <div class="card bg-light border-0 p-3">
+                        <div class="row g-2">
+                            {% for checkbox in field %}
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-check bg-white rounded p-2 border">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label small text-dark fw-bold ms-1" for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% empty %}
+                                <p class="small text-muted mb-0">No specific skills listed yet.</p>
+                            {% endfor %}
+                            
+                            <div class="col-12 mt-2">
+                                <div class="form-check ps-1">
+                                    <input class="form-check-input" type="checkbox" id="noSkillCheck" onchange="toggleSkills(this)">
+                                    <label class="form-check-label small text-muted fst-italic ms-2" for="noSkillCheck">
+                                        I have no skills yet (I want to learn)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="input-group">
+                      <input type="{{ field.field.widget.input_type }}" 
+                             name="{{ field.name }}" 
+                             id="{{ field.id_for_label }}"
+                             class="form-control bg-light border-0 py-2"
+                             {% if field.field.required %}required{% endif %}
+                             value="{{ field.value|default:'' }}">
+                    </div>
+                {% endif %}
+
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in field.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                
+                {% if field.help_text and field.name != 'skills' %}
+                  <div class="form-text small text-muted" style="font-size: 0.7rem;">
+                    {{ field.help_text|safe }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <div class="col-12 mt-4">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" required id="termsCheck">
+                <label class="form-check-label small text-secondary" for="termsCheck">
+                  I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and confirm I am a student.
+                </label>
+              </div>
+              
+              <button type="submit" class="btn btn-warning w-100 btn-lg rounded-pill fw-bold shadow-sm text-dark hover-lift">
+                Complete Registration
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+    <!-- skilss checkbox -->
+<script>
+    function toggleSkills(noSkillCheckbox) {
+        
+        const checkboxes = document.querySelectorAll('input[name="skills"]');
+        
+        if (noSkillCheckbox.checked) {
+            
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.disabled = true;
+            });
+        } else {
+            
+            checkboxes.forEach(cb => cb.disabled = false);
+        }
+    }
+</script>
+{% endblock %}

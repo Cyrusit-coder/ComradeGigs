@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us | ComradeGigs{% endblock %}
+
+{% block content %}
+     <!-- who we are  -->
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8 text-center">
+        <h6 class="text-warning fw-bold text-uppercase letter-spacing-2 mb-3">
+          <i class="bi bi-info-circle-fill me-2"></i>Our Story
+        </h6>
+        <h2 class="display-5 fw-bolder text-primary mb-4">Built by Comrades, For Comrades</h2>
+        <p class="lead fs-5 text-dark mb-4">
+          ComradeGigs isn't just a website; it's a movement. We realized that many students have immense talent but lack the connection to real-world work.
+        </p>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm text-center h-100">
+                <i class="bi bi-rocket-takeoff text-primary fs-1 mb-3"></i>
+                <h5 class="fw-bold">Mission</h5>
+                <p class="text-secondary small">To eradicate student poverty by monetizing skills.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm text-center h-100">
+                <i class="bi bi-eye text-warning fs-1 mb-3"></i>
+                <h5 class="fw-bold">Vision</h5>
+                <p class="text-secondary small">A world where every graduate leaves with a portfolio, not just a degree.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm text-center h-100">
+                <i class="bi bi-heart text-danger fs-1 mb-3"></i>
+                <h5 class="fw-bold">Values</h5>
+                <p class="text-secondary small">Integrity, Hustle, and Community Support.</p>
+            </div>
+        </div>
+    </div>
+          <!-- past achievements -->
+    <div class="row g-4 mb-5">
+        <div class="col-12 text-center mb-2">
+            <h3 class="fw-bold">See the Platform in Action</h3>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
+                <img src="{%static 'images/comcoding.jpg' %}" class="img-fluid object-fit-cover h-100" alt="Students Working">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
+                <img src="{% static 'images/charity.jpg' %}" class="img-fluid object-fit-cover h-100" alt="Charity Visit">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
+                <img src="{% static 'images/teamsucces.jpg' %}" class="img-fluid object-fit-cover h-100" alt="Success">
+            </div>
+        </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

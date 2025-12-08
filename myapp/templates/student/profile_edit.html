@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="fw-bold mb-0">Profile Settings</h2>
+          <a href="{% url 'myapp:student_dashboard' %}" class="btn btn-outline-secondary rounded-pill fw-bold">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+          </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row g-4">
+            
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 text-center">
+                  
+                  <h6 class="fw-bold text-secondary text-uppercase small mb-4">Profile Photo</h6>
+                  
+                  <div class="position-relative d-inline-block mb-3">
+                    {% if user.profile_image %}
+                      <img src="{{ user.profile_image.url }}" class="rounded-circle border border-4 border-light shadow-sm object-fit-cover" width="150" height="150" alt="Avatar">
+                    {% else %}
+                      <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm fs-1 fw-bold border border-4 border-light" style="width: 150px; height: 150px;">
+                        {{ user.username|slice:":1"|upper }}
+                      </div>
+                    {% endif %}
+                    
+                    <label for="id_profile_image" class="position-absolute bottom-0 end-0 bg-white text-primary rounded-circle p-2 shadow-sm border border-2 border-white cursor-pointer hover-scale">
+                      <i class="bi bi-camera-fill"></i>
+                    </label>
+                  </div>
+                  
+                  <input type="file" name="profile_image" id="id_profile_image" class="d-none">
+                  
+                  <p class="small text-muted mb-4">Tap the camera icon to update.</p>
+
+                  <hr class="border-light my-4">
+
+                  <div class="form-check form-switch d-flex justify-content-start align-items-center bg-light p-3 rounded-3">
+                    <input class="form-check-input me-3" type="checkbox" role="switch" name="exam_mode" id="examMode" {% if user.student_profile.exam_mode %}checked{% endif %}>
+                    <div class="text-start">
+                      <label class="form-check-label fw-bold text-dark" for="examMode">Exam Mode</label>
+                      <small class="d-block text-muted" style="font-size: 0.75rem;">Pauses gig notifications.</small>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-8">
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 p-md-5">
+                  
+                  <h5 class="fw-bold text-primary mb-4"><i class="bi bi-person-vcard me-2"></i>Personal Details</h5>
+                  
+                  <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold small text-secondary">Username</label>
+                      <input type="text" class="form-control bg-light border-0" value="{{ user.username }}" disabled>
+                      <div class="form-text small">Username cannot be changed.</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold small text-secondary">Phone (M-Pesa)</label>
+                      <input type="text" name="phone_number" value="{{ user.phone_number }}" class="form-control bg-light border-0" placeholder="07XXXXXXXX">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label fw-bold small text-secondary">Email Address</label>
+                      <input type="email" name="email" value="{{ user.email }}" class="form-control bg-light border-0">
+                    </div>
+                  </div>
+
+                  <h5 class="fw-bold text-warning mb-4 mt-5"><i class="bi bi-mortarboard me-2"></i>Campus Info</h5>
+                  
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold small text-secondary">University</label>
+                      <select name="university" class="form-select bg-light border-0">
+                        <option value="UoN" {% if user.student_profile.university == 'UoN' %}selected{% endif %}>UoN</option>
+                        <option value="KU" {% if user.student_profile.university == 'KU' %}selected{% endif %}>Kenyatta University</option>
+                        <option value="JKUAT" {% if user.student_profile.university == 'JKUAT' %}selected{% endif %}>JKUAT</option>
+                        <option value="Strathmore" {% if user.student_profile.university == 'Strathmore' %}selected{% endif %}>Strathmore</option>
+                        <option value="Other" {% if user.student_profile.university == 'Other' %}selected{% endif %}>Other</option>
+                      </select>
+                    </div>
+                    
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold small text-secondary">Year of Study</label>
+                      <input type="number" name="year_of_study" value="{{ user.student_profile.year_of_study }}" class="form-control bg-light border-0">
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label fw-bold small text-secondary">Course / Major</label>
+                      <input type="text" name="course" value="{{ user.student_profile.course }}" class="form-control bg-light border-0" placeholder="e.g. Bsc. Computer Science">
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label fw-bold small text-secondary">My Skills (Comma Separated)</label>
+                      <textarea name="skills" class="form-control bg-light border-0" rows="3" placeholder="e.g. Python, Graphic Design, Academic Writing">{{ user.student_profile.skills }}</textarea>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold px-5 shadow-sm">
+                      Save Changes
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cursor-pointer { cursor: pointer; }
+  .hover-scale:hover { transform: scale(1.1); transition: transform 0.2s; }
+  .object-fit-cover { object-fit: cover; }
+</style>
+{% endblock %}

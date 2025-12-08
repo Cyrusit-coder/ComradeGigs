@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Review Applicants | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{% url 'myapp:client_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Review Applicants</li>
+      </ol>
+    </nav>
+
+    <div class="row align-items-center mb-5">
+      <div class="col-md-8">
+        <h2 class="fw-bold mb-1">Applicants for: <span class="text-primary">{{ job.title }}</span></h2>
+        <p class="text-secondary">
+          <span class="fw-bold text-dark">{{ job.applications.count }}</span> students have applied for this gig.
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <span class="badge bg-white text-dark border px-3 py-2 rounded-pill">
+          Budget: Ksh {{ job.budget }}
+        </span>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      
+      {% for app in job.applications.all %}
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift">
+          <div class="card-body p-4">
+            
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="d-flex align-items-center">
+                {% if app.student.profile_image %}
+                  <img src="{{ app.student.profile_image.url }}" class="rounded-circle me-3 object-fit-cover" width="60" height="60">
+                {% else %}
+                  <div class="bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold fs-4" style="width: 60px; height: 60px;">
+                    {{ app.student.username|slice:":1"|upper }}
+                  </div>
+                {% endif %}
+                <div>
+                  <h5 class="fw-bold mb-0 text-dark">{{ app.student.username }}</h5>
+                  <small class="text-muted">{{ app.student.student_profile.university }} &bull; {{ app.student.student_profile.year_of_study }} Year</small>
+                  
+                  <div class="mt-1">
+                    {% if app.student.student_profile.badges_earned > 0 %}
+                      <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill" style="font-size: 0.65rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified Skills</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="d-block fw-bold text-success fs-5">Ksh {{ app.bid_amount|default:job.budget }}</span>
+                <small class="text-muted">Bid Amount</small>
+              </div>
+            </div>
+
+            <div class="bg-light rounded-3 p-3 mb-4">
+              <h6 class="fw-bold small text-secondary text-uppercase mb-2">Cover Letter</h6>
+              <p class="small text-dark mb-0 fst-italic">"{{ app.cover_letter }}"</p>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex">
+              <button class="btn btn-outline-secondary rounded-pill fw-bold flex-grow-1" title="Message Student">
+                <i class="bi bi-chat-dots"></i> Message
+              </button>
+              <form method="post" action="#" class="flex-grow-1">
+                {% csrf_token %}
+                <input type="hidden" name="applicant_id" value="{{ app.id }}">
+                <button type="submit" name="action" value="hire" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">
+                  Hire Candidate
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-hourglass-split text-secondary fs-2"></i>
+          </div>
+          <h5 class="fw-bold text-secondary">Waiting for Applicants</h5>
+          <p class="small text-muted">Your gig is live! Students will start applying soon.</p>
+        </div>
+      {% endfor %}
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}

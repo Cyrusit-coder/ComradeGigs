@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Web Basics Course | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8 text-center">
+        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3 fw-bold">
+          Skill Module: Web Basics
+        </span>
+        <h2 class="fw-bolder text-dark mb-3">HTML/CSS Assessment</h2>
+        <p class="text-secondary lead fs-6">
+          Review the core tags below and build a simple structure to earn your badge.
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-5">
+          <div class="card-body p-5">
+            <h4 class="fw-bold text-primary mb-4"><i class="bi bi-code-square me-2"></i>Quick Study Guide</h4>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <h6 class="fw-bold">1. HTML Structure</h6>
+                <code class="d-block bg-light p-3 rounded mb-3 text-dark">
+                  &lt;h1&gt;Main Title&lt;/h1&gt;<br>
+                  &lt;p&gt;Paragraph text...&lt;/p&gt;<br>
+                  &lt;a href="#"&gt;Link&lt;/a&gt;
+                </code>
+                
+                <h6 class="fw-bold">2. Bootstrap Classes (We use this!)</h6>
+                <p class="small text-secondary">
+                  Instead of writing raw CSS, use classes like <code>text-center</code>, <code>btn btn-primary</code>, and <code>row/col</code> for layout.
+                </p>
+              </div>
+              
+              <div class="col-md-6 border-start-md">
+                <h6 class="fw-bold">3. Common Tags</h6>
+                <ul class="small text-secondary mb-4">
+                  <li><strong>&lt;img&gt;:</strong> Always needs an 'src' and 'alt'.</li>
+                  <li><strong>&lt;div&gt;:</strong> The box that holds content.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-primary bg-gradient text-white p-4">
+            <h4 class="fw-bold mb-0"><i class="bi bi-laptop-fill me-2"></i>The Practical Test</h4>
+          </div>
+          <div class="card-body p-5">
+            
+            <div class="alert alert-primary border-0 d-flex align-items-center mb-4">
+              <i class="bi bi-code-slash fs-4 me-3"></i>
+              <div>
+                <strong>Task:</strong> Create a simple "About Me" page using HTML.
+                <br>Include: <em>A Heading (h1), a paragraph about yourself, and a button.</em>
+              </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">1. Paste your GitHub/Replit Link</label>
+                <input type="url" name="link" class="form-control form-control-lg bg-light border-0" placeholder="https://github.com/...">
+              </div>
+
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">2. Or Upload index.html file</label>
+                <input type="file" name="file" class="form-control form-control-lg bg-light border-0">
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
+                  Submit Web Assessment <i class="bi bi-send-fill ms-2"></i>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

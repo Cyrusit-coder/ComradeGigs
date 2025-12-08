@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}FAQs | ComradeGigs{% endblock %}
+
+{% block content %}
+               <!-- frequently asked questions -->
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="text-center mb-5">
+      <h6 class="text-warning fw-bold text-uppercase letter-spacing-2">Help Center</h6>
+      <h2 class="display-6 fw-bold text-dark">Frequently Asked Questions</h2>
+      <p class="text-secondary">Everything you need to know about fees, trust, and earning.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden" id="faqAccordion">
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a1">
+                <i class="bi bi-person-plus-fill me-3 text-primary"></i> Is it free to join?
+              </button>
+            </h2>
+            <div id="a1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary">
+                <strong>Yes!</strong> Joining ComradeGigs is 100% free for Students, Clients, and Donors. You only pay (or get charged) when a real transaction happens.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">
+                <i class="bi bi-pie-chart-fill me-3 text-warning"></i> Does the platform take a commission?
+              </button>
+            </h2>
+            <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary">
+                To keep the website running, secure, and free of scammers, we deduct a small <strong>5% service fee</strong> from the student's earnings upon completing a gig. 
+                <br><br>
+                <em>Example: If you earn Ksh 1,000, you receive Ksh 950, and Ksh 50 goes to platform maintenance.</em>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a3">
+                <i class="bi bi-cash-stack me-3 text-success"></i> How do I get paid?
+              </button>
+            </h2>
+            <div id="a3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary">
+                Payments are processed via <strong>Secure M-Pesa Transfer</strong>. When a client accepts your work, the funds are released directly to the phone number on your profile. No delays.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a4">
+                <i class="bi bi-shield-check me-3 text-danger"></i> Is it safe from scammers?
+              </button>
+            </h2>
+            <div id="a4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary">
+                Yes. We verify Client payments before you start working. 
+                <br><strong>Warning:</strong> Never share your personal phone number or accept payment outside the site. If you do, we cannot protect you if they refuse to pay.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="text-center mt-5">
+          <p class="text-muted small">Still have questions?</p>
+          <a href="{% url 'myapp:contact' %}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Contact Support</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

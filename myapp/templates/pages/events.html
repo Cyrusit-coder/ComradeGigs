@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Events | ComradeGigs{% endblock %}
+
+{% block content %}
+         <!-- blue hero section  with grid dot texture -->
+<section class="py-5 bg-primary bg-gradient text-white position-relative overflow-hidden">
+  <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" 
+       style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+  
+  <div class="container position-relative z-1 text-center py-4">
+    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 mb-3">Community Happenings</span>
+    <h1 class="display-4 fw-bold mb-3">Connect, Learn & Give Back</h1>
+    <p class="lead opacity-75 mx-auto" style="max-width: 600px;">
+      Join the movement. From coding bootcamps to charity visits, see what the ComradeGigs alliance is up to this month.
+    </p>
+  </div>
+</section>
+    <!-- event part -->
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="d-flex justify-content-between align-items-end mb-5">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Upcoming Events</h2>
+        <p class="text-secondary small mb-0">Mark your calendars.</p>
+      </div>
+      <div class="d-none d-md-block">
+        <button class="btn btn-dark rounded-pill btn-sm fw-bold px-3">All</button>
+        <button class="btn btn-outline-secondary rounded-pill btn-sm fw-bold px-3">Education</button>
+        <button class="btn btn-outline-secondary rounded-pill btn-sm fw-bold px-3">Charity</button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
+          <div class="position-relative">
+            <img src="{% static 'images/freebootcamp.jpg' %}" class="card-img-top object-fit-cover" alt="Event" style="height: 200px;">
+            <span class="badge bg-primary position-absolute top-0 start-0 m-3 shadow-sm">Education</span>
+          </div>
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex align-items-center text-muted small mb-3">
+              <i class="bi bi-calendar-event me-2 text-primary"></i> <span class="fw-bold me-3">Dec 15</span>
+              <i class="bi bi-clock me-2 text-primary"></i> <span>7:00 PM (Virtual)</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Freelancing Bootcamp 101</h5>
+            <p class="text-secondary small mb-4 flex-grow-1">
+              Learn how to write proposals that win clients. Guest speaker: Brian (Top Rated Seller).
+            </p>
+            <a href="#" class="btn btn-outline-primary w-100 rounded-pill fw-bold">Register Free</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
+          <div class="position-relative">
+            <img src="{% static 'images/childrens.jpg' %}" class="card-img-top object-fit-cover" alt="Event" style="height: 200px;">
+            <span class="badge bg-success position-absolute top-0 start-0 m-3 shadow-sm">Charity</span>
+          </div>
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex align-items-center text-muted small mb-3">
+              <i class="bi bi-calendar-event me-2 text-success"></i> <span class="fw-bold me-3">Dec 22</span>
+              <i class="bi bi-geo-alt me-2 text-success"></i> <span>Baraka Children's Home</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Giving Back Saturday</h5>
+            <p class="text-secondary small mb-4 flex-grow-1">
+              We are visiting Baraka Home with food stuffs and mentorship. Contributions needed!
+            </p>
+            <a href="#" class="btn btn-outline-success w-100 rounded-pill fw-bold">Join the Team</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
+          <div class="position-relative">
+            <img src="{% static 'images/djangocoding.jpg' %}" class="card-img-top object-fit-cover" alt="Event" style="height: 200px;">
+            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 shadow-sm">Workshop</span>
+          </div>
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex align-items-center text-muted small mb-3">
+              <i class="bi bi-calendar-event me-2 text-warning"></i> <span class="fw-bold me-3">Jan 05</span>
+              <i class="bi bi-geo-alt me-2 text-warning"></i> <span>UoN Science Lab</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Django for Beginners</h5>
+            <p class="text-secondary small mb-4 flex-grow-1">
+              Physical coding session. Bring your laptop. We will build a simple portfolio site.
+            </p>
+            <a href="#" class="btn btn-outline-warning text-dark w-100 rounded-pill fw-bold">Save a Seat</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
+          <div class="position-relative">
+            <img src="{% static 'images/mental.jpg' %}" class="card-img-top object-fit-cover" alt="Event" style="height: 200px;">
+            <span class="badge bg-info text-white position-absolute top-0 start-0 m-3 shadow-sm">Wellness</span>
+          </div>
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex align-items-center text-muted small mb-3">
+              <i class="bi bi-calendar-event me-2 text-info"></i> <span class="fw-bold me-3">Jan 12</span>
+              <i class="bi bi-clock me-2 text-info"></i> <span>Google Meet</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Surviving Campus Pressure</h5>
+            <p class="text-secondary small mb-4 flex-grow-1">
+              Open talk about handling exam stress, finances, and relationships. Safe space.
+            </p>
+            <a href="#" class="btn btn-outline-info w-100 rounded-pill fw-bold">Get Link</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
+          <div class="position-relative">
+            <img src="{% static 'images/gaming.jpg' %}" class="card-img-top object-fit-cover" alt="Event" style="height: 200px;">
+            <span class="badge bg-danger position-absolute top-0 start-0 m-3 shadow-sm">Social</span>
+          </div>
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex align-items-center text-muted small mb-3">
+              <i class="bi bi-calendar-event me-2 text-danger"></i> <span class="fw-bold me-3">Jan 20</span>
+              <i class="bi bi-controller me-2 text-danger"></i> <span>Westlands Arena</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Comrade Gamers Night</h5>
+            <p class="text-secondary small mb-4 flex-grow-1">
+              FIFA, COD, and Mortal Kombat tournament. Entry fee: Ksh 200. Winner takes Ksh 5k.
+            </p>
+            <a href="#" class="btn btn-outline-danger w-100 rounded-pill fw-bold">Register</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+     <!-- past events part -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h3 class="fw-bold">Previous Highlights</h3>
+      <p class="text-secondary">See what we've accomplished together.</p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <img src="{% static 'images/charity.jpg' %}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" style="height: 250px;">
+      </div>
+      <div class="col-md-4">
+        <img src="{% static 'images/graduation.jpg' %}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" style="height: 250px;">
+      </div>
+      <div class="col-md-4">
+        <img src="{% static 'images/techtalk.jpg' %}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" style="height: 250px;">
+      </div>
+    </div>
+  </div>
+</section>
+          <!-- what event do you have ?contact us -->
+<section class="py-5 bg-dark text-white rounded-5 mx-3 mb-5 shadow-lg">
+  <div class="container text-center py-3">
+    <h2 class="fw-bold mb-3">Have an Idea for an Event?</h2>
+    <p class="opacity-75 mb-4">Want to host a workshop or organize a charity drive? Let us know!</p>
+    <a href="{% url 'myapp:contact' %}" class="btn btn-warning btn-lg rounded-pill fw-bold px-5">Suggest an Event</a>
+  </div>
+</section>
+
+{% endblock %}

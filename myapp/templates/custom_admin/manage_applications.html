@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Verify Applications | Admin{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light min-vh-100">
+  <div class="container">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+          <h2 class="fw-bold mb-0 text-primary">
+              <i class="bi bi-file-earmark-person me-2"></i>Verify Applications
+          </h2>
+          <p class="text-secondary mb-0">Approve students for specific gigs.</p>
+      </div>
+      <a href="{% url 'myapp:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
+          &larr; Back to Dashboard
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="px-4 py-3 text-uppercase small fw-bold text-secondary">Student</th>
+                <th class="px-4 py-3 text-uppercase small fw-bold text-secondary">Applying For</th>
+                <th class="px-4 py-3 text-uppercase small fw-bold text-secondary">Bid Amount</th>
+                <th class="px-4 py-3 text-uppercase small fw-bold text-secondary">Cover Letter</th>
+                <th class="px-4 py-3 text-end text-uppercase small fw-bold text-secondary">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for app in pending_apps %}
+              <tr>
+                <td class="px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-2 fw-bold" style="width: 35px; height: 35px; display:flex; justify-content:center; align-items:center;">
+                            {{ app.student.username|first|upper }}
+                        </div>
+                        <div>
+                            <span class="fw-bold d-block text-dark">{{ app.student.username }}</span>
+                            <small class="text-muted">Applied {{ app.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                </td>
+
+                <td class="px-4">
+                    <span class="fw-bold text-dark">{{ app.job.title }}</span>
+                    <br>
+                    <small class="text-muted">Budget: Ksh {{ app.job.budget }}</small>
+                </td>
+
+                <td class="px-4">
+                    <span class="badge bg-info bg-opacity-10 text-info border border-info px-3 rounded-pill">
+                        Ksh {{ app.bid_amount }}
+                    </span>
+                </td>
+
+                <td class="px-4">
+                    <span class="text-muted small" title="{{ app.cover_letter }}">
+                        {{ app.cover_letter|truncatechars:50 }}
+                    </span>
+                </td>
+
+                <td class="px-4 text-end">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <form action="{% url 'myapp:admin_process_application' app.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">
+                                Reject
+                            </button>
+                        </form>
+
+                        <form action="{% url 'myapp:admin_process_application' app.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="return confirm('Approve this student? This will assign the job to them.');">
+                                <i class="bi bi-check-lg me-1"></i> Approve
+                            </button>
+                        </form>
+                    </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                  <td colspan="5" class="text-center py-5">
+                      <div class="text-muted">
+                          <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                          No pending applications found.
+                      </div>
+                  </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

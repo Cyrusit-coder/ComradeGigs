@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ job.title }} | ComradeGigs{% endblock %}
+
+{% block content %}
+    <!-- job details  -->
+<div class="container py-5">
+  
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'myapp:job_list' %}" class="text-decoration-none text-secondary">Gigs</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ job.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 mb-4">
+        
+        <div class="d-flex justify-content-between align-items-start mb-4">
+          <h1 class="fw-bold h2 mb-0 text-dark">{{ job.title }}</h1>
+          <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill fs-6">
+            Ksh {{ job.budget }}
+          </span>
+        </div>
+
+        <div class="mb-4">
+          <h5 class="fw-bold text-dark">Description</h5>
+          <p class="text-secondary" style="line-height: 1.7;">
+            {{ job.description|linebreaks }}
+          </p>
+        </div>
+
+        <div class="d-flex align-items-center text-muted small">
+          <i class="bi bi-clock me-2"></i> Posted {{ job.created_at|timesince }} ago
+          <span class="mx-2">&bull;</span>
+          <i class="bi bi-person-circle me-2"></i> Client: {{ job.client.username|title }}
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-lg rounded-4 position-sticky" style="top: 100px;">
+        <div class="card-body p-4">
+          <!-- only logged in students can apply -->
+          <h5 class="fw-bold text-dark mb-3">Apply Now</h5>
+
+          {% if not user.is_authenticated %}
+            <div class="text-center py-3">
+              <p class="small text-muted">You must be logged in to apply.</p>
+              <a href="{% url 'myapp:login' %}?next={{ request.path }}" class="btn btn-primary w-100 rounded-pill fw-bold">
+                Login to Apply
+              </a>
+            </div>
+
+          {% elif user.role != 'student' %}
+             <div class="alert alert-warning small mb-0">
+               Only <strong>Student Accounts</strong> can apply for gigs. You are logged in as a {{ user.get_role_display }}.
+             </div>
+
+          {% else %}
+            <!-- proposal form sort of cover letter -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label class="form-label small fw-bold text-secondary">Why are you the best fit?</label>
+                  <textarea name="cover_letter" class="form-control bg-light border-0" rows="5" placeholder="I have experience in..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill btn-lg fw-bold shadow-sm">
+                  Submit Proposal
+                </button>
+              </form>
+
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

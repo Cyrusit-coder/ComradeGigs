@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home | ComradeGigs{% endblock %}
+
+{% block content %}
+
+<header class="py-5 bg-light bg-gradient rounded-bottom-5 shadow-sm mb-5 hero-section">
+    <div class="container py-lg-5">
+        <div class="row align-items-center gy-4">
+
+            <div class="col-lg-7 col-md-6 order-2 order-md-1 text-center text-md-start">
+                <!-- just a conditional greeting badge to users welcoming them back -->
+                {% if user.is_authenticated %}
+                    <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
+                        Welcome back, {{ user.username|title }}!
+                    </span>
+                {% endif %}
+
+                <h1 class="fw-bolder display-5 text-primary mb-4">
+                    Empowering Comrades Through <span class="text-warning">Skills</span>, <span class="text-warning">Gigs</span> and Real Support
+                </h1>
+                
+                <p class="lead fs-5 text-dark mb-4">
+                    ComradeGigs is a digital space where university comrades can learn skills, find gigs,
+                    earn money and avoid <em>kuinama</em>. Whether you are talented, skilled or just starting your journey,
+                    this platform gives you a chance to rise.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
+                    <!-- cotent of logined in users only -->
+                    {% if user.is_authenticated %}
+                        <!-- what students will see -->
+                        {% if user.role == 'student' %}
+                            <a href="{% url 'myapp:job_list' %}" class="btn btn-primary btn-lg rounded-pill fw-bold px-4 shadow-sm hover-lift">
+                                <i class="bi bi-briefcase-fill me-2"></i>Find Work
+                            </a>
+                            <a href="{% url 'myapp:learn_skills' %}" class="btn btn-outline-warning text-dark btn-lg rounded-pill fw-bold px-4 hover-lift">
+                                <i class="bi bi-lightning-fill me-2"></i>Upskill
+                            </a>
+                                <!-- what client will see -->
+                        {% elif user.role == 'client' %}
+                            <a href="{% url 'myapp:job_create' %}" class="btn btn-primary btn-lg rounded-pill fw-bold px-4 shadow-sm hover-lift">
+                                <i class="bi bi-plus-lg me-2"></i>Post a Gig
+                            </a>
+                            <a href="{% url 'myapp:client_dashboard' %}" class="btn btn-outline-primary btn-lg rounded-pill fw-bold px-4 hover-lift">
+                                Manage Jobs
+                            </a>
+                           <!-- what donor will see -->
+                        {% elif user.role == 'donor' %}
+                            <a href="{% url 'myapp:donate' %}" class="btn btn-danger btn-lg rounded-pill fw-bold px-4 shadow-sm hover-lift">
+                                <i class="bi bi-heart-fill me-2"></i>Donate Now
+                            </a>
+                            <a href="{% url 'myapp:donor_dashboard' %}" class="btn btn-outline-danger btn-lg rounded-pill fw-bold px-4 hover-lift">
+                                View Impact
+                            </a>
+                         <!-- superuser part(admin) -->
+                        {% elif user.is_superuser %}
+                             <a href="{% url 'myapp:admin_dashboard' %}" class="btn btn-dark btn-lg rounded-pill fw-bold px-4 shadow-sm hover-lift">
+                                <i class="bi bi-shield-lock-fill me-2"></i>Admin Panel
+                            </a>
+                        {% endif %}
+                       <!-- what  unlogged in users will see -->
+                    {% else %}
+                        
+                        <a href="{% url 'myapp:register_student' %}" class="btn btn-primary btn-lg rounded-pill fw-bold px-4 shadow-sm hover-lift">
+                            <i class="bi bi-rocket-takeoff-fill me-2"></i>Join as Student
+                        </a>
+                        <a href="{% url 'myapp:job_list' %}" class="btn btn-outline-primary btn-lg rounded-pill fw-bold px-4 hover-lift">
+                            Browse Gigs
+                        </a>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="col-lg-5 col-md-6 order-1 order-md-2 mb-4 mb-md-0">
+                <img src="{% static 'images/teamsucces.jpg' %}" alt="Students Hustling" class="img-fluid rounded-4 shadow-lg border border-4 border-white">
+            </div>
+
+        </div>
+    </div>
+</header>
+
+            <!-- our mission as comradegigs -->
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h5 class="text-primary fw-bold text-uppercase ls-2 mb-3">Our Mission</h5>
+                <h2 class="fw-bolder mb-4">Who We Are</h2>
+                <p class="lead text-dark fs-5">
+                    We are a community-driven platform built for university comrades who want to improve their skills,
+                    earn money through simple gigs and overcome the tough financial struggles that make many students
+                    <em>kuinama</em> every week.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+            <!-- our job (what we do) -->
+<section class="py-5 bg-light bg-opacity-50 rounded-5 mx-3 shadow-sm mb-5">
+    <div class="container py-4">
+        <h2 class="fw-bolder text-center mb-5 display-6">What We Do</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 text-center py-4 px-3 hover-lift transition-all">
+                    <div class="card-body">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-4" style="width: 80px; height: 80px;">
+                            <i class="bi bi-briefcase-fill fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Connect Skills to Gigs</h4>
+                        <p class="text-dark mb-0">Students with skills get matched to gigs posted by clients. Work, earn and grow.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 text-center py-4 px-3 hover-lift transition-all">
+                    <div class="card-body">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mb-4" style="width: 80px; height: 80px;">
+                            <i class="bi bi-mortarboard-fill fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Offer Learning Pathways</h4>
+                        <p class="text-dark mb-0">New comrades can access mini courses and pass assessments before applying for gigs.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 text-center py-4 px-3 hover-lift transition-all">
+                    <div class="card-body">
+                         <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-4" style="width: 80px; height: 80px;">
+                            <i class="bi bi-heart-fill fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Facilitate Donations</h4>
+                        <p class="text-dark mb-0">Donors can support comrades through MPesa donations for fees or upkeep.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+               <!-- conected events -->
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h6 class="text-warning fw-bold text-uppercase small mb-1">Community</h6>
+                <h2 class="fw-bolder mb-0 display-6">Upcoming Events</h2>
+            </div>
+            <a href="{% url 'myapp:events' %}" class="btn btn-outline-secondary rounded-pill btn-sm fw-bold">View Calendar</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 hover-lift">
+                    <div class="row g-0 h-100">
+                        <div class="col-4 bg-primary text-white d-flex flex-column align-items-center justify-content-center p-3 text-center">
+                            <span class="display-6 fw-bold">15</span>
+                            <span class="text-uppercase small fw-bold">Dec</span>
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body d-flex flex-column h-100 justify-content-center">
+                                <span class="badge bg-light text-primary w-auto align-self-start mb-2">Education</span>
+                                <h5 class="fw-bold mb-1">Freelancing Bootcamp 101</h5>
+                                <p class="text-muted small mb-2">Learn how to write proposals that win clients.</p>
+                                <a href="#" class="text-primary fw-bold text-decoration-none small stretched-link">Register Free &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 hover-lift">
+                    <div class="row g-0 h-100">
+                        <div class="col-4 bg-success text-white d-flex flex-column align-items-center justify-content-center p-3 text-center">
+                            <span class="display-6 fw-bold">22</span>
+                            <span class="text-uppercase small fw-bold">Dec</span>
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body d-flex flex-column h-100 justify-content-center">
+                                <span class="badge bg-light text-success w-auto align-self-start mb-2">Charity</span>
+                                <h5 class="fw-bold mb-1">Giving Back Saturday</h5>
+                                <p class="text-muted small mb-2">Visiting <em>Baraka Children's Home</em> with food & mentorship.</p>
+                                <a href="#" class="text-success fw-bold text-decoration-none small stretched-link">Join the Team &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+            <!-- what other students says about us(testimonials) -->
+<section class="py-5 bg-light rounded-5 mx-3 shadow-sm mb-5">
+    <div class="container py-4">
+      <div class="row justify-content-center mb-5">
+        <div class="col-lg-8 text-center">
+          <h6 class="text-warning fw-bold text-uppercase letter-spacing-2 mb-2">
+            <i class="bi bi-chat-quote-fill me-2"></i>Wall of Love
+          </h6>
+          <h2 class="display-5 fw-bolder text-primary mb-3">Comrades Winning Against Kuinama</h2>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100 p-4 hover-lift">
+            <div class="d-flex align-items-center mb-3">
+              <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 fs-5 fw-bold" style="width: 50px; height: 50px;">BK</div>
+              <div><h6 class="fw-bold mb-0 text-dark">Brian K.</h6><small class="text-muted">JKUAT, Year 3</small></div>
+            </div>
+            <p class="text-dark opacity-75 fst-italic small">"I was about to miss my exams because of a 5k fee balance. I picked up a Data Entry gig on Tuesday and cleared my balance by Friday!"</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100 p-4 hover-lift bg-primary bg-gradient text-white">
+            <div class="d-flex align-items-center mb-3">
+               <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fs-5 fw-bold" style="width: 50px; height: 50px;">SW</div>
+              <div><h6 class="fw-bold mb-0">Stacy W.</h6><small class="text-white-50">UoN, Year 2</small></div>
+            </div>
+            <p class="text-white opacity-75 fst-italic small">"I took the free Graphic Design mini-course, got my badge, and now I design posters for campus events. I haven't asked my parents for pocket money in 3 months."</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100 p-4 hover-lift">
+            <div class="d-flex align-items-center mb-3">
+               <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3 fs-5 fw-bold" style="width: 50px; height: 50px;">KO</div>
+              <div><h6 class="fw-bold mb-0 text-dark">Kevin O.</h6><small class="text-muted">KU, Year 4</small></div>
+            </div>
+            <p class="text-dark opacity-75 fst-italic small">"When HELB delayed, I used the Donation feature to request support for food. A verified alumni sent me Ksh 1,000 for shopping. It kept me going."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+           <!-- join us part -->
+<section class="py-5">
+    <div class="container text-center">
+        {% if user.is_authenticated %}
+        <!-- logged in student -->
+            {% if user.role == 'student' %}
+                <h2 class="fw-bold mb-3">Ready to Earn?</h2>
+                <a href="{% url 'myapp:job_list' %}" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm">Start Applying</a>
+                <!-- logged in client -->
+            {% elif user.role == 'client' %}
+                <h2 class="fw-bold mb-3">Have a Task?</h2>
+                <a href="{% url 'myapp:job_create' %}" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm">Post a Gig Now</a>
+            {% endif %}
+            <!-- new users part -->
+        {% else %}
+            <h2 class="fw-bold mb-3">Ready to Join the Alliance?</h2>
+            <a href="{% url 'myapp:register_landing' %}" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm">Get Started Now</a>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

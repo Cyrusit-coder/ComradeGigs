@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Browse Gigs | ComradeGigs{% endblock %}
+     <!-- job lists as seen on the browser -->
+{% block content %}
+<section class="py-4 bg-light">
+  <div class="container">
+    
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+      <form method="get" class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-secondary"></i></span>
+            <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search gigs (e.g. 'Logo Design')">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select name="category" class="form-select text-secondary">
+            <option value="">All Categories</option>
+            <option value="design">Graphic Design</option>
+            <option value="web">Web Development</option>
+            <option value="writing">Writing</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100 fw-bold rounded-3">Filter</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="row g-4">
+      
+      {% for job in jobs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
+          <div class="card-body p-4 d-flex flex-column">
+            
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge bg-light text-secondary border rounded-pill small">{{ job.get_status_display }}</span>
+              <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill fw-bold">Ksh {{ job.budget }}</span>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-2">
+              <a href="{% url 'myapp:job_detail' job.id %}" class="text-decoration-none text-dark">{{ job.title }}</a>
+            </h5>
+            
+            <p class="text-secondary small mb-4 flex-grow-1">
+              {{ job.description|truncatewords:20 }}
+            </p>
+
+            <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-light">
+              <div class="d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 small fw-bold" style="width: 30px; height: 30px;">
+                  {{ job.client.username|slice:":1"|upper }}
+                </div>
+                <small class="text-muted">{{ job.created_at|timesince }} ago</small>
+              </div>
+              
+              <a href="{% url 'myapp:job_detail' job.id %}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold">View Gig</a>
+            
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-inbox text-muted fs-2"></i>
+          </div>
+          <h5 class="fw-bold text-secondary">No Gigs Found</h5>
+          <p class="small text-muted">Try adjusting your filters or check back later.</p>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+{% endblock %}

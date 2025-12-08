@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Control Panel | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <span class="badge bg-dark text-white rounded-pill px-3 py-2 mb-2">Superuser Access</span>
+        <h2 class="fw-bold mb-0">Platform Administration</h2>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'myapp:job_create' %}" class="btn btn-warning rounded-pill fw-bold shadow-sm">
+          <i class="bi bi-plus-lg me-2"></i>Post Admin Gig
+        </a>
+        <a href="{% url 'myapp:admin_users' %}" class="btn btn-dark rounded-pill fw-bold shadow-sm">
+          <i class="bi bi-people-fill me-2"></i>Manage Users
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      
+      <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-success bg-opacity-10">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h6 class="text-success text-uppercase small fw-bold mb-0">User Base</h6>
+                <div class="bg-white rounded-circle p-2 shadow-sm text-success">
+                    <i class="bi bi-people-fill fs-4"></i>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-baseline gap-2">
+                <h2 class="fw-bold mb-0 text-success">{{ total_users_count|default:"1,240" }}</h2>
+                <span class="small text-success fw-bold">+ New</span>
+            </div>
+            
+            <p class="small text-success opacity-75 mt-1 mb-0">Total registered accounts</p>
+
+            <div class="mt-4">
+                <a href="{% url 'myapp:admin_users' %}" class="btn btn-success text-white btn-sm rounded-pill fw-bold shadow-sm w-100">
+                    View All Users
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-warning bg-opacity-10">
+          <div class="card-body">
+            <h6 class="text-dark text-uppercase small fw-bold mb-3">Pending Approval</h6>
+            <div class="d-flex align-items-center justify-content-between">
+              <h2 class="fw-bold mb-0 text-dark">{{ pending_gigs_count|default:"0" }}</h2>
+              <div class="bg-white rounded-circle p-2 shadow-sm">
+                <i class="bi bi-shield-check fs-4 text-warning"></i>
+              </div>
+            </div>
+            <div class="mt-3">
+                <a href="{% url 'myapp:admin_verify_gigs' %}" class="btn btn-warning btn-sm rounded-pill fw-bold shadow-sm w-100">
+                    Verify Gigs
+                </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-info bg-opacity-10">
+            <div class="card-body">
+                <h6 class="text-dark text-uppercase small fw-bold mb-3">Skill Reviews</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold mb-0 text-dark">{{ pending_assessments_count|default:"0" }}</h2>
+                    <div class="bg-white rounded-circle p-2 shadow-sm">
+                        <i class="bi bi-patch-check-fill fs-4 text-info"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'myapp:admin_verify_skills' %}" class="btn btn-info text-white btn-sm rounded-pill fw-bold shadow-sm w-100">
+                        Verify Students
+                    </a>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-danger bg-opacity-10">
+            <div class="card-body">
+                <h6 class="text-danger text-uppercase small fw-bold mb-3">Expired Gigs</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold mb-0 text-danger">{{ expired_gigs_count|default:"0" }}</h2>
+                    <div class="bg-white rounded-circle p-2 shadow-sm">
+                        <i class="bi bi-trash3-fill fs-4 text-danger"></i>
+                    </div>
+                </div>
+                <p class="small text-danger mt-2 mb-0">Past deadline cleanup</p>
+                <div class="mt-3">
+                    <a href="{% url 'myapp:admin_manage_expired' %}" class="btn btn-danger text-white btn-sm rounded-pill fw-bold shadow-sm w-100">
+                        Clean Up Now
+                    </a>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <h5 class="fw-bold text-secondary border-bottom pb-2">Workflows & Approvals</h5>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-primary bg-opacity-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h6 class="text-primary text-uppercase small fw-bold mb-1">Student Applications</h6>
+                            <p class="small text-muted mb-0">Review bids for open gigs</p>
+                        </div>
+                        <div class="bg-white rounded-circle p-2 shadow-sm text-primary">
+                            <i class="bi bi-file-earmark-person fs-4"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-baseline gap-2 mb-3">
+                        <h2 class="fw-bold mb-0 text-primary">{{ pending_apps_count|default:"0" }}</h2>
+                        <span class="small text-muted">pending review</span>
+                    </div>
+
+                    <a href="{% url 'myapp:admin_manage_applications' %}" class="btn btn-primary btn-sm rounded-pill fw-bold shadow-sm w-100">
+                        Verify Applications
+                    </a>
+                </div>
+            </div>
+        </div>
+      </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Donor Sign Up | ComradeGigs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+      
+      <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+        
+        <div class="bg-danger bg-gradient p-4 text-center text-white">
+          <div class="mb-2">
+            <i class="bi bi-heart-fill fs-1 text-white"></i>
+          </div>
+          <h3 class="fw-bold mb-1">Become a Donor</h3>
+          <p class="small opacity-75 mb-0">Join the community of supporters.</p>
+        </div>
+
+        <div class="card-body p-5">
+          <form method="post" class="row g-3">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="col-12">
+                <div class="alert alert-danger d-flex align-items-center mb-2 rounded-3 small">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <div>
+                    {% for error in form.non_field_errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+
+            {% for field in form %}
+              <div class="col-12">
+                <label class="form-label fw-bold small text-secondary">{{ field.label }}</label>
+                
+                <div class="input-group">
+                  <input type="{{ field.field.widget.input_type }}" 
+                         name="{{ field.name }}" 
+                         id="{{ field.id_for_label }}"
+                         class="form-control bg-light border-0 py-2"
+                         {% if field.field.required %}required{% endif %}
+                         value="{{ field.value|default:'' }}">
+                </div>
+
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in field.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                
+                {% if field.help_text %}
+                  <div class="form-text small text-muted" style="font-size: 0.7rem;">
+                    {{ field.help_text|safe }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-danger w-100 btn-lg rounded-pill fw-bold shadow-sm hover-lift">
+                Start Supporting <i class="bi bi-arrow-right-short ms-1"></i>
+              </button>
+            </div>
+
+          </form>
+        </div>
+        
+        <div class="card-footer bg-white text-center py-3 border-0">
+          <small class="text-secondary">Already have an account? <a href="{% url 'myapp:login' %}" class="fw-bold text-danger text-decoration-none">Log In</a></small>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

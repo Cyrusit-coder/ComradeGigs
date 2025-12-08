@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Verify Skills | Admin{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold mb-0">Skill Verification Queue</h2>
+      <a href="{% url 'myapp:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill">Back to Dashboard</a>
+    </div>
+
+    <div class="row g-4">
+      {% for sub in submissions %}
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <div>
+              <span class="badge bg-primary bg-opacity-10 text-primary mb-1">{{ sub.skill_name }}</span>
+              <h5 class="fw-bold mb-0">{{ sub.student.username }}</h5>
+            </div>
+            <small class="text-muted">{{ sub.submitted_at|timesince }} ago</small>
+          </div>
+          
+          <div class="card-body">
+            <h6 class="fw-bold text-secondary small text-uppercase">Submission Proof</h6>
+            
+            {% if sub.description %}
+              <div class="p-3 bg-light rounded-3 mb-3 small fst-italic">
+                "{{ sub.description }}"
+              </div>
+            {% endif %}
+
+            <ul class="list-unstyled mb-4">
+              {% if sub.proof_link %}
+                <li class="mb-2">
+                  <i class="bi bi-link-45deg text-primary me-2"></i>
+                  <a href="{{ sub.proof_link }}" target="_blank" class="fw-bold text-decoration-none">View External Link</a>
+                </li>
+              {% endif %}
+              
+              {% if sub.proof_file %}
+                <li>
+                  <i class="bi bi-file-earmark-arrow-down text-success me-2"></i>
+                  <a href="{{ sub.proof_file.url }}" target="_blank" class="fw-bold text-decoration-none">Download File</a>
+                </li>
+              {% endif %}
+            </ul>
+
+            <div class="d-grid gap-2 d-md-flex">
+              <form method="post" action="{% url 'myapp:admin_approve_skill' sub.id %}" class="flex-grow-1">
+                {% csrf_token %}
+                <button type="submit" name="action" value="approve" class="btn btn-success w-100 rounded-pill fw-bold">
+                  <i class="bi bi-check-circle me-2"></i>Approve Badge
+                </button>
+              </form>
+              
+              <form method="post" action="{% url 'myapp:admin_approve_skill' sub.id %}" class="flex-grow-1">
+                {% csrf_token %}
+                <button type="submit" name="action" value="reject" class="btn btn-outline-danger w-100 rounded-pill fw-bold">
+                  Reject
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="mb-3 text-success">
+            <i class="bi bi-patch-check-fill" style="font-size: 4rem;"></i>
+          </div>
+          <h4>All Caught Up!</h4>
+          <p class="text-muted">No pending skill assessments.</p>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

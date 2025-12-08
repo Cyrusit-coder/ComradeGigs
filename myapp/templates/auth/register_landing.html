@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Join the Alliance | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light h-100 d-flex align-items-center">
+  <div class="container">
+    
+    <div class="text-center mb-5">
+      <h2 class="fw-bold display-6">Choose Your Path</h2>
+      <p class="text-secondary">How do you want to interact with the platform?</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift text-center p-4">
+          <div class="card-body">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-4 mb-4">
+              <i class="bi bi-backpack4-fill fs-1"></i>
+            </div>
+            <h4 class="fw-bold">I am a Student</h4>
+            <p class="text-secondary small mb-4">
+              I want to earn money, build my skills, and find gigs while in campus.
+            </p>
+            <a href="{% url 'myapp:register_student' %}" class="btn btn-primary w-100 rounded-pill fw-bold">Join as Student</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift text-center p-4">
+          <div class="card-body">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex p-4 mb-4">
+              <i class="bi bi-briefcase-fill fs-1"></i>
+            </div>
+            <h4 class="fw-bold">I am a Client</h4>
+            <p class="text-secondary small mb-4">
+              I want to hire talented students for short-term projects or gigs.
+            </p>
+            <a href="{% url 'myapp:register_client' %}" class="btn btn-outline-success w-100 rounded-pill fw-bold">Join as Client</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift text-center p-4">
+          <div class="card-body">
+            <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex p-4 mb-4">
+              <i class="bi bi-heart-fill fs-1"></i>
+            </div>
+            <h4 class="fw-bold">I am a Donor</h4>
+            <p class="text-secondary small mb-4">
+              I want to support students financially to avoid <em>kuinama</em>.
+            </p>
+            <a href="{% url 'myapp:register_donor' %}" class="btn btn-outline-danger w-100 rounded-pill fw-bold">Join as Donor</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="text-center mt-5">
+      <p class="small">Already have an account? <a href="{% url 'myapp:login' %}" class="fw-bold text-decoration-none">Log In here</a></p>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Virtual Assistant Course | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8 text-center">
+        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 mb-3 fw-bold">
+          Skill Module: Virtual Assistant
+        </span>
+        <h2 class="fw-bolder text-dark mb-3">Admin & Organization Assessment</h2>
+        <p class="text-secondary lead fs-6">
+          Prove your organizational skills. Learn how to handle professional emails, data entry, and research for busy clients.
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-5">
+          <div class="card-body p-5">
+            <h4 class="fw-bold text-success mb-4"><i class="bi bi-check2-square me-2"></i>Quick Study Guide</h4>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <h6 class="fw-bold">1. Email Etiquette</h6>
+                <p class="small text-secondary mb-3">
+                  Always start with a professional greeting ("Dear [Name]"). Be concise. Use bullet points for tasks. End with a clear call to action and a "Best Regards".
+                </p>
+                
+                <h6 class="fw-bold">2. Google Suite Mastery</h6>
+                <p class="small text-secondary">
+                  <strong>Docs:</strong> For notes/writing. <strong>Sheets:</strong> For data entry. <strong>Calendar:</strong> For scheduling. Always check sharing permissions (Viewer vs Editor) before sending links.
+                </p>
+              </div>
+              
+              <div class="col-md-6 border-start-md">
+                <h6 class="fw-bold">3. Calendar Management</h6>
+                <p class="small text-secondary mb-3">
+                  When scheduling, always confirm the <strong>TimeZone</strong> (e.g., EST, GMT, EAT). Send actual calendar invites, not just text confirmations.
+                </p>
+
+                <h6 class="fw-bold">4. Internet Research</h6>
+                <p class="small text-secondary">
+                  Clients pay for summarized info, not raw links. If asked to find "Top 5 Laptops", provide a clean spreadsheet comparing Price, Specs, and Reviews.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-success bg-gradient text-white p-4">
+            <h4 class="fw-bold mb-0"><i class="bi bi-envelope-paper-fill me-2"></i>The Practical Test</h4>
+          </div>
+          <div class="card-body p-5">
+            
+            <div class="alert alert-success border-0 d-flex align-items-center mb-4">
+              <i class="bi bi-calendar-check fs-4 me-3"></i>
+              <div>
+                <strong>Task 1:</strong> Write a professional email response to a client who is angry about a delayed project.
+                <br><em>Be polite, apologize, give a reason, and propose a solution.</em>
+              </div>
+            </div>
+
+            <form method="post">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">1. Write your email draft here:</label>
+                <textarea name="email_draft" class="form-control bg-light border-0" rows="6" placeholder="Subject: Regarding the delay...&#10;&#10;Dear Client..." required></textarea>
+              </div>
+
+              <hr class="my-4">
+
+              <div class="alert alert-success border-0 d-flex align-items-center mb-4">
+                <i class="bi bi-table fs-4 me-3"></i>
+                <div>
+                  <strong>Task 2 (Optional):</strong> Create a simple Google Sheet listing 5 Hotels in Nairobi with their prices per night.
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="fw-bold text-dark mb-2">2. Paste Link to Google Sheet (Optional)</label>
+                <input type="url" name="link" class="form-control bg-light border-0" placeholder="https://docs.google.com/spreadsheets/...">
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm">
+                  Submit Assessment <i class="bi bi-send-fill ms-2"></i>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
