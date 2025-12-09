@@ -20,10 +20,9 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-# 3. Skill model 
+# 3. Skill model (With Icon support)
 class Skill(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    # This allows the dashboard to show cool icons for each badge!
     icon_class = models.CharField(max_length=50, default='bi-star-fill', help_text="Bootstrap icon class")
 
     def __str__(self):
@@ -45,7 +44,6 @@ class StudentProfile(models.Model):
     exam_mode = models.BooleanField(default=False)
 
     # Verification Fields
-    # This checks if the student is generally verified (global verification)
     is_skill_verified = models.BooleanField(default=False) 
     skill_assessment_submission = models.FileField(upload_to='assessments/', null=True, blank=True)
 
@@ -63,8 +61,6 @@ class Job(models.Model):
     )
 
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
-    
-    #  related_name='assigned_jobs' allows us to use request.user.assigned_jobs in the view
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_jobs')
     
     title = models.CharField(max_length=200)
@@ -79,7 +75,7 @@ class Job(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='review')
     created_at = models.DateTimeField(auto_now_add=True)
     
-    #Tracks when the job was finished (useful for sorting earnings history)
+    # Tracks when the job was finished
     completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
@@ -102,7 +98,7 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.student.username} applied to {self.job.title}"
 
-# 7. Donation field
+# 7. Donation field (Restored to simple version)
 class Donation(models.Model):
     donor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='donations')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -115,7 +111,36 @@ class Donation(models.Model):
     def __str__(self):
         return f"Ksh {self.amount} - {'Paid' if self.is_paid else 'Pending'}"
 
-# 8. Skill submission for the verification of the system
+# 8. Payment Model (Centralized Logic)
+class Payment(models.Model):
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('SUCCESS', 'Success'),
+        ('FAILED', 'Failed'),
+    )
+    
+    payer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments_made')
+    # Beneficiary is optional (None for donations, Specific Student for jobs)
+    beneficiary = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments_received')
+    
+    job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True, blank=True)
+    donation = models.ForeignKey(Donation, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    purpose = models.CharField(max_length=20) # 'JOB' or 'DONATION'
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    checkout_request_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    mpesa_receipt = models.CharField(max_length=50, null=True, blank=True)
+    result_code = models.IntegerField(null=True, blank=True)
+    raw_callback = models.JSONField(null=True, blank=True)
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.purpose} - {self.amount} ({self.status})"
+
+# 9. Skill submission for verification
 class SkillSubmission(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending Review'),
@@ -124,7 +149,7 @@ class SkillSubmission(models.Model):
     )
     
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='skill_submissions')
-    skill_name = models.CharField(max_length=100) # e.g., "Graphic Design"
+    skill_name = models.CharField(max_length=100)
     proof_link = models.URLField(blank=True, null=True)
     proof_file = models.FileField(upload_to='skills_proof/', blank=True, null=True)
     description = models.TextField(blank=True)

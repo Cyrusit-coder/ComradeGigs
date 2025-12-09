@@ -4,7 +4,6 @@
 {% block title %}Client Dashboard | ComradeGigs{% endblock %}
 
 {% block content %}
-           <!-- client dashboard -->
 <section class="py-5 bg-light">
   <div class="container">
     
@@ -72,7 +71,7 @@
         <div class="list-group-item p-4 border-bottom hover-bg-light">
           <div class="row align-items-center">
             
-            <div class="col-lg-6 mb-3 mb-lg-0">
+            <div class="col-lg-5 mb-3 mb-lg-0">
               <div class="d-flex align-items-center mb-2">
                 <h5 class="fw-bold mb-0 text-dark me-2">{{ job.title }}</h5>
                 {% if job.status == 'open' %}
@@ -91,19 +90,42 @@
             </div>
 
             <div class="col-lg-3 mb-3 mb-lg-0 text-lg-center">
-              <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1">
-                <i class="bi bi-people me-2 text-secondary"></i>
-                <span class="fw-bold">{{ job.applications.count }}</span> <span class="small ms-1">Applicants</span>
-              </div>
+               {% if job.assigned_to %}
+                  <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 border">
+                    <i class="bi bi-person-check-fill me-2 text-primary"></i>
+                    <span class="small text-muted me-1">Hired:</span>
+                    <span class="fw-bold text-dark">{{ job.assigned_to.username }}</span>
+                  </div>
+               {% else %}
+                  <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1">
+                    <i class="bi bi-people me-2 text-secondary"></i>
+                    <span class="fw-bold">{{ job.applications.count }}</span> <span class="small ms-1">Applicants</span>
+                  </div>
+               {% endif %}
             </div>
 
-            <div class="col-lg-3 text-lg-end d-flex gap-2 justify-content-lg-end">
-              <a href="{% url 'myapp:applicant_review' job.id %}" class="btn btn-primary btn-sm rounded-pill fw-bold px-3">
-                Review <span class="d-none d-xl-inline">Applicants</span>
-              </a>
-              <a href="{% url 'myapp:job_edit' job.id %}" class="btn btn-outline-secondary btn-sm rounded-circle" title="Edit Gig">
+            <div class="col-lg-4 text-lg-end d-flex gap-2 justify-content-lg-end align-items-center">
+              
+              {% if job.status == 'open' %}
+                  <a href="{% url 'myapp:applicant_review' job.id %}" class="btn btn-primary btn-sm rounded-pill fw-bold px-3">
+                    Review Applicants
+                  </a>
+              
+              {% elif job.status == 'assigned' %}
+                  <a href="{% url 'myapp:pay_for_job' job.id %}" class="btn btn-success btn-sm rounded-pill fw-bold px-4 shadow-sm">
+                    <i class="bi bi-credit-card-2-front-fill me-2"></i>Pay Now
+                  </a>
+
+              {% elif job.status == 'completed' %}
+                  <span class="text-success fw-bold small"><i class="bi bi-check-all me-1"></i>Paid & Closed</span>
+              {% endif %}
+
+              {% if job.status != 'completed' %}
+              <a href="{% url 'myapp:job_edit' job.id %}" class="btn btn-outline-secondary btn-sm rounded-circle ms-1" title="Edit Gig">
                 <i class="bi bi-pencil-fill"></i>
               </a>
+              {% endif %}
+
             </div>
 
           </div>

@@ -1,23 +1,30 @@
-import json  # parse incoming JSON data from M-Pesa callbacks
-import traceback  # Helps print detailed error logs to the terminal for debugging
-from django.shortcuts import render, redirect, get_object_or_404  
-from django.contrib.auth import login, logout  # log a user in or out of the session
-from django.contrib.auth.decorators import login_required  # Decorator to protect views so only logged-in users can see them
-from django.contrib import messages   # Framework to send flash notifications (Success, Error, Warning alerts)
-from django.db.models import Sum  # Database tool to calculate totals (like adding up total earnings)
-from django.urls import reverse_lazy, reverse  # Converts a URL name (like 'home') into a real link string
-from django.views.decorators.csrf import csrf_exempt  # Allows external requests (like M-Pesa) to post data without a security token
-from django.http import HttpResponse, JsonResponse  # Used to send raw text or JSON data back (instead of a full HTML page)
-from django.conf import settings  # Allows access to variables in your settings.py (like API keys)
-from django.utils import timezone  # Django's tool for handling dates and times (used for checking expired gigs)
+import json
+import traceback
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Sum
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from django.conf import settings
+from django.utils import timezone
 
-from .models import User, Job, Application, Donation, StudentProfile, Skill, SkillSubmission
+# Safe Import for M-Pesa (prevents crash if library missing)
+try:
+    from .mpesa import stk_push
+except ImportError:
+    stk_push = None
+    print("WARNING: 'requests' library not found. M-Pesa functions will fail.")
+
+from .models import User, Job, Application, Donation, StudentProfile, Skill, SkillSubmission, Payment
 from .forms import (
     StudentRegisterForm, ClientRegisterForm, DonorRegisterForm, 
     JobForm, StudentProfileForm, DonationForm
 )
 
-# --- normal public pages ---
+# --- 1. PUBLIC PAGES ---
 def home(request):
     return render(request, 'pages/home.html')
 
@@ -33,7 +40,7 @@ def contact(request):
 def faqs(request):
     return render(request, 'pages/faqs.html')
 
-# --- authenticated users views ---
+# --- 2. AUTHENTICATION ---
 def login_view(request):
     from django.contrib.auth.views import LoginView
     
@@ -96,38 +103,32 @@ def register_donor(request):
         form = DonorRegisterForm()
     return render(request, 'auth/register_donor.html', {'form': form})
 
-# student views
+# --- 3. STUDENT VIEWS ---
 @login_required
 def student_dashboard(request):
     if request.user.role != 'student':
         return redirect('myapp:home')
     
-    # 1. Get recent applications (Limit to 5)
     apps = request.user.my_applications.all().order_by('-created_at')[:5]
-    
-    # 2. get active jobs (assignments)
-
     active_jobs_list = request.user.assigned_jobs.filter(status='assigned').order_by('deadline')
     
-    # 3. Calculate total earnings
-    
+    # Calculate Earnings (Jobs marked completed)
     earnings_data = request.user.assigned_jobs.filter(status='completed').aggregate(Sum('budget'))
     total_earnings = earnings_data['budget__sum'] or 0
     
     context = {
         'my_apps': apps,
         'active_jobs_count': active_jobs_list.count(),
-        'active_jobs_list': active_jobs_list, # Passing the full list for your "active projects" card
-        'total_earnings': total_earnings,     # Passing this for the "total earnings" card
+        'active_jobs_list': active_jobs_list, 
+        'total_earnings': total_earnings,     
     }
     return render(request, 'student/dashboard.html', context)
+
 def job_list(request):
     jobs = Job.objects.filter(status='open').order_by('-created_at')
-    
     query = request.GET.get('q')
     if query:
         jobs = jobs.filter(title__icontains=query)
-        
     return render(request, 'student/job_list.html', {'jobs': jobs})
 
 def job_detail(request, pk):
@@ -180,7 +181,6 @@ def profile_edit(request):
             
             messages.success(request, "Profile Updated Successfully")
             return redirect('myapp:student_dashboard')
-            
     else:
         initial_data = {
             'email': request.user.email,
@@ -189,13 +189,6 @@ def profile_edit(request):
         form = StudentProfileForm(instance=profile, initial=initial_data)
     
     return render(request, 'student/profile_edit.html', {'form': form})
-
-def approve_student_skill(request, student_id):
-    student = get_object_or_404(StudentProfile, id=student_id)
-    student.is_skill_verified = True
-    student.save()
-    # this triggers the badge to appear on their profile(student prof)
-    return redirect('admin_panel')
 
 @login_required
 def learn_skills(request):
@@ -253,30 +246,21 @@ def skill_writing(request):
         return redirect('myapp:student_dashboard')
     return render(request, "student/skill_writing.html")
 
+# --- 4. CLIENT VIEWS ---
 @login_required
 def client_dashboard(request):
     if request.user.role != 'client':
         return redirect('myapp:home')
     
     user = request.user
-    
-    # 1. Get the list of jobs (for the recent postings table)
     jobs = user.posted_jobs.all().order_by('-created_at')
     
-    
-    # 2. Count active jobs
-    
     active_jobs_count = jobs.filter(status__in=['open', 'assigned']).count()
-    
-    # 3. Count applicants reviewing
-    
     applicants_reviewing_count = Application.objects.filter(
         job__client=user, 
         is_accepted=False, 
         is_rejected=False
     ).count()
-    
-    # 4. Count completed gigs
     completed_gigs_count = jobs.filter(status='completed').count()
     
     context = {
@@ -289,7 +273,6 @@ def client_dashboard(request):
 
 @login_required
 def job_create(request):
-    # Allow clients or Superusers to post gigs or jobs the admin verifies
     if request.user.role != 'client' and not request.user.is_superuser:
         messages.error(request, "Access Denied. Only Clients can post gigs.")
         return redirect('myapp:home')
@@ -300,7 +283,6 @@ def job_create(request):
             job = form.save(commit=False)
             job.client = request.user
             
-            # admin posts a gig and it goes immediately, clients gigs have to be approved 
             if request.user.is_superuser:
                 job.status = 'open' 
                 message_text = "Gig posted successfully! It is Live."
@@ -309,7 +291,7 @@ def job_create(request):
                 message_text = "Gig posted! Pending admin approval."
                 
             job.save()
-            form.save_m2m() # important for ManyToMany fields (eg skills)
+            form.save_m2m()
             messages.success(request, message_text)
             
             if request.user.is_superuser:
@@ -348,20 +330,69 @@ def applicant_review(request, job_id):
 
     return render(request, 'client/applicant_review.html', {'job': job})
 
-# donor views
+# CLIENT PAY FOR JOB (M-Pesa Integration)
+@login_required
+def pay_for_job(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+
+    if request.user != job.client:
+        return JsonResponse({"error": "Not allowed"}, status=403)
+
+    if request.method == "POST":
+        phone = request.POST.get("phone")
+        amount = job.budget
+
+        # 1. Create Payment Record
+        payment = Payment.objects.create(
+            payer=request.user,
+            beneficiary=job.assigned_to, # Valid: Payment model has beneficiary
+            purpose='JOB',
+            amount=amount,
+            job=job,
+            status='PENDING'
+        )
+
+        # 2. Build Callback URL
+        base_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000')
+        if "confirmation" in base_url:
+             callback_url = base_url
+        else:
+             callback_url = f"{base_url}/mpesa/confirmation"
+
+        # 3. Trigger STK Push
+        if stk_push:
+            resp = stk_push(
+                phone_number=phone,
+                amount=amount,
+                account_reference=f"JOB-{job.id}",
+                transaction_desc=f"Payment for {job.title}",
+                callback_url=callback_url,
+            )
+        else:
+            resp = {"error": "M-Pesa library not loaded"}
+
+        # 4. Handle Response
+        if "ResponseCode" in resp and resp["ResponseCode"] == "0":
+            checkout_request_id = resp.get("CheckoutRequestID")
+            payment.checkout_request_id = checkout_request_id
+            payment.save()
+            messages.success(request, f"STK Push sent to {phone}. Check your phone to pay.")
+        else:
+            err_msg = resp.get('errorMessage') or resp.get('error') or "Unknown error"
+            payment.status = 'FAILED'
+            payment.save()
+            messages.error(request, f"Payment Failed: {err_msg}")
+
+        return redirect("myapp:client_dashboard")
+
+    return render(request, "client/pay_for_job.html", {"job": job})
+
+# --- 5. DONOR VIEWS ---
 @login_required
 def donor_dashboard(request):
-    # 1. get donation history
     donations = request.user.donations.all().order_by('-date')
-    
-    # 2. Calculate Total Contributed Sum of only paid donations
     total_data = donations.filter(is_paid=True).aggregate(Sum('amount'))
-    
-    # If there are no donations, amount__sum will be None, so we verify it with 'or 0'
     total_contributed = total_data['amount__sum'] or 0
-    
-    # 3. Calculate Comrades Supported
-    # Logic: assuming roughly Ksh 500 supports one comrade (meal/bundles)
     comrades_supported = int(total_contributed / 500)
     
     context = {
@@ -376,57 +407,152 @@ def donate(request):
     if request.method == 'POST':
         amount = request.POST.get('amount')
         phone = request.POST.get('phone')
-        
-        # Create the donation record (initially unpaid)
+
+        # 1. Create Donation Record (NO BENEFICIARY FIELD HERE)
         donation = Donation.objects.create(
             donor=request.user,
             amount=amount,
-            is_paid=False 
+            is_paid=False
         )
-        
-        # Pass the phone number to the payment page to trigger STK Push
-        return render(request, 'donor/pay.html', {'donation': donation, 'phone_number': phone})
-        
-    return render(request, 'donor/donate_form.html')
+
+        # 2. Create Payment Record (Linked to Donation)
+        payment = Payment.objects.create(
+            payer=request.user,
+            beneficiary=None, # Correct: Donations have no specific student beneficiary
+            purpose='DONATION',
+            amount=amount,
+            donation=donation,
+            status='PENDING'
+        )
+
+        # 3. Build Callback URL
+        base_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000')
+        if "confirmation" in base_url:
+             callback_url = base_url
+        else:
+             callback_url = f"{base_url}/mpesa/confirmation"
+
+        # 4. Trigger STK Push
+        if stk_push:
+            resp = stk_push(
+                phone_number=phone,
+                amount=amount,
+                account_reference=f"DON-{donation.id}",
+                transaction_desc="ComradeGigs Donation",
+                callback_url=callback_url,
+            )
+        else:
+            resp = {"error": "M-Pesa library not loaded"}
+
+        # 5. Handle Response
+        if "ResponseCode" in resp and resp["ResponseCode"] == "0":
+            checkout_request_id = resp.get("CheckoutRequestID")
+            payment.checkout_request_id = checkout_request_id
+            payment.save()
+            messages.success(request, f"STK Push sent to {phone}. Please confirm payment.")
+            
+            # Show waiting screen
+            return render(
+                request,
+                'donor/pay.html',
+                {'donation': donation, 'payment': payment, 'phone_number': phone}
+            )
+        else:
+            err_msg = resp.get('errorMessage') or resp.get('error') or "Unknown error"
+            payment.status = 'FAILED'
+            payment.save()
+            messages.error(request, f"Donation Failed: {err_msg}")
+            return redirect('myapp:donor_dashboard')
+
+    return render(request, 'donor/donate_form.html') 
 
 @login_required
 def donate_success(request):
-    last_donation = Donation.objects.filter(donor=request.user).last()
-    if last_donation:
-        last_donation.is_paid = True
-        last_donation.save()
-    return render(request, 'donor/donate_success.html')
+    last_donation = Donation.objects.filter(
+        donor=request.user,
+        is_paid=True
+    ).order_by('-date').first()
+    return render(request, 'donor/donate_success.html', {'donation': last_donation})
 
-# mpesa callback
+# --- 6. M-PESA CALLBACK ---
 @csrf_exempt
 def mpesa_confirmation(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            # Add logic here to update the Donation model based on callback
-            return JsonResponse({"status": "ok"})
-        except:
-            return HttpResponse(status=400)
-    return HttpResponse(status=400)
+    if request.method != 'POST':
+        return HttpResponse(status=400)
 
-# admin views
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        body = data.get("Body", {})
+        stk_callback = body.get("stkCallback", {})
+        result_code = stk_callback.get("ResultCode")
+        checkout_request_id = stk_callback.get("CheckoutRequestID")
+
+        try:
+            payment = Payment.objects.get(checkout_request_id=checkout_request_id)
+        except Payment.DoesNotExist:
+            traceback.print_exc()
+            return JsonResponse({"error": "Payment not found"}, status=404)
+
+        payment.result_code = result_code
+        payment.raw_callback = data
+
+        if result_code == 0:
+            # SUCCESS
+            items = stk_callback.get("CallbackMetadata", {}).get("Item", [])
+            receipt = None
+            for item in items:
+                if item.get("Name") == "MpesaReceiptNumber":
+                    receipt = item.get("Value")
+                    break
+
+            payment.status = 'SUCCESS'
+            payment.mpesa_receipt = receipt
+            payment.save()
+
+            # Update Donation Record
+            if payment.purpose == 'DONATION' and payment.donation:
+                donation = payment.donation
+                donation.is_paid = True
+                donation.mpesa_code = receipt
+                donation.save()
+
+            # Update Job Record
+            if payment.purpose == 'JOB' and payment.job:
+                job = payment.job
+                # Logic: Job is now paid for.
+                # You might want to update job status to 'completed' or 'paid' depending on your flow
+                job.save()
+
+        else:
+            # FAILED / CANCELLED
+            payment.status = 'FAILED'
+            payment.save()
+
+        return JsonResponse({"status": "ok"})
+
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponse(status=400)
+
+# --- 7. ADMIN VIEWS ---
 @login_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('myapp:home')
     
-    #stats for dashboard
+    # 1. Fetch Admin's Own Posted Gigs (For Payment Section)
+    my_posted_jobs = Job.objects.filter(client=request.user).order_by('-created_at')
+
+    # 2. Fetch Platform-wide Stats
     total_users_count = User.objects.count()
     pending_gigs_count = Job.objects.filter(status='review').count()
     pending_assessments_count = SkillSubmission.objects.filter(status='pending').count()
     
-    # Count expired gigs
     expired_gigs_count = Job.objects.filter(
         deadline__lt=timezone.now(), 
         status__in=['open', 'review', 'assigned']
     ).count()
 
-    #Count pending applications neither accepted nor rejected
     pending_apps_count = Application.objects.filter(is_accepted=False, is_rejected=False).count()
     
     context = {
@@ -435,6 +561,7 @@ def admin_dashboard(request):
         'pending_assessments_count': pending_assessments_count,
         'expired_gigs_count': expired_gigs_count,
         'pending_apps_count': pending_apps_count,
+        'my_posted_jobs': my_posted_jobs,  # Added this so the template can loop over it
     }
     
     return render(request, 'custom_admin/dashboard.html', context)
@@ -534,14 +661,11 @@ def admin_approve_skill(request, submission_id):
             
     return redirect('myapp:admin_verify_skills')
 
-# management of expired gigs views
-
 @login_required
 def admin_manage_expired(request):
     if not request.user.is_superuser:
         return redirect('myapp:home')
 
-    # Get all gigs where deadline has passed
     expired_jobs = Job.objects.filter(
         deadline__lt=timezone.now(),
         status__in=['open', 'review', 'assigned']
@@ -560,14 +684,11 @@ def admin_delete_gig(request, job_id):
     
     return redirect('myapp:admin_manage_expired')
 
-# application workflow views
-
 @login_required
 def admin_manage_applications(request):
     if not request.user.is_superuser:
         return redirect('myapp:home')
 
-    # Get all applications that haven't been decided yet
     pending_apps = Application.objects.filter(
         is_accepted=False, 
         is_rejected=False
@@ -587,16 +708,13 @@ def admin_process_application(request, app_id):
         action = request.POST.get('action')
         
         if action == 'approve':
-            # 1. Accept this application
             application.is_accepted = True
             application.save()
             
-            # 2. Assign the job to this student
             job.assigned_to = application.student
             job.status = 'assigned' 
             job.save()
             
-            # 3. Reject other applicants for this same job 
             other_apps = Application.objects.filter(job=job).exclude(id=application.id)
             other_apps.update(is_rejected=True)
             

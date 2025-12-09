@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirm Payment | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light" style="min-height: 80vh;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          
+          <div class="bg-success bg-gradient p-4 text-center text-white">
+            <div class="mb-2">
+              <i class="bi bi-shield-lock-fill fs-1"></i>
+            </div>
+            <h4 class="fw-bold mb-1">Secure Checkout</h4>
+            <p class="small opacity-75 mb-0">Complete payment via M-Pesa</p>
+          </div>
+
+          <div class="card-body p-4 p-md-5">
+            
+            <div class="bg-light rounded-3 p-3 mb-4 text-center border border-success border-opacity-10">
+              <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem;">Paying For Gig</small>
+              <h5 class="fw-bold text-dark mb-1 text-truncate">{{ job.title }}</h5>
+              <div class="d-flex justify-content-center align-items-baseline gap-1 mt-2">
+                <span class="text-muted small">Total:</span>
+                <h2 class="text-success fw-bold mb-0">Ksh {{ job.budget }}</h2>
+              </div>
+            </div>
+
+            <form method="post">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="form-label fw-bold small text-secondary">M-Pesa Phone Number</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-white border-end-0 text-success">
+                    <i class="bi bi-phone-vibrate"></i>
+                  </span>
+                  <input type="text" name="phone" 
+                         class="form-control border-start-0 ps-0 bg-white" 
+                         placeholder="0712 345 678" 
+                         required 
+                         autofocus>
+                </div>
+                <div class="form-text small text-muted mt-2">
+                  <i class="bi bi-info-circle-fill text-success me-1"></i>
+                  Ensure your phone screen is unlocked to receive the STK Push.
+                </div>
+              </div>
+
+              <div class="d-grid gap-3">
+                <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm hover-lift">
+                  Pay Ksh {{ job.budget }}
+                </button>
+                
+                <a href="{% url 'myapp:client_dashboard' %}" class="btn btn-light rounded-pill fw-bold text-secondary">
+                  Cancel Transaction
+                </a>
+              </div>
+
+            </form>
+          </div>
+          
+          <div class="card-footer bg-light border-0 py-3 text-center">
+            <p class="small text-muted mb-0">
+              <i class="bi bi-lock-fill me-1"></i> Secured by M-Pesa Daraja API
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
