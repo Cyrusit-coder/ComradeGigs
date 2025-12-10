@@ -4,14 +4,14 @@ from . import views
 app_name = 'myapp'  
 
 urlpatterns = [
-    # --- 1. Public Pages ---
+    # 1. Public Pages
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('events/', views.events, name='events'),
     path('faqs/', views.faqs, name='faqs'),
 
-    # --- 2. Authentication ---
+    # 2. Authentication 
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('join/', views.register_landing, name='register_landing'),
@@ -37,19 +37,20 @@ urlpatterns = [
     path('client/post-gig/', views.job_create, name='job_create'),
     path('client/gig/<int:pk>/edit/', views.job_edit, name='job_edit'),
     path('client/gig/<int:job_id>/review/', views.applicant_review, name='applicant_review'),
+    path('client/gig/<int:pk>/delete/', views.job_delete, name='job_delete'),
     
     # PAYMENT ROUTE (Triggers M-Pesa STK Push)
     path('client/gig/<int:job_id>/pay/', views.pay_for_job, name='pay_for_job'),
 
-    # --- 5. Donor Section ---
+    # 5. Donor Section
     path('donor/dashboard/', views.donor_dashboard, name='donor_dashboard'),
     path('donate/', views.donate, name='donate'),
     path('donate/confirm/', views.donate_success, name='donate_success'),
 
-    # --- 6. M-PESA Callback (Public) ---
+    # 6. M-PESA Callback (Public)
     path('mpesa/confirmation/', views.mpesa_confirmation, name='mpesa_confirmation'),
 
-    # --- 7. Custom Admin Panel ---
+    # 7. Custom Admin Panel 
     path('admin-panel/', views.admin_dashboard, name='admin_dashboard'),
     
     # Management

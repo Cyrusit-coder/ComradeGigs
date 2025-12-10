@@ -24,7 +24,7 @@ from .forms import (
     JobForm, StudentProfileForm, DonationForm
 )
 
-# --- 1. PUBLIC PAGES ---
+# 1. PUBLIC PAGES
 def home(request):
     return render(request, 'pages/home.html')
 
@@ -40,7 +40,7 @@ def contact(request):
 def faqs(request):
     return render(request, 'pages/faqs.html')
 
-# --- 2. AUTHENTICATION ---
+#2. AUTHENTICATION 
 def login_view(request):
     from django.contrib.auth.views import LoginView
     
@@ -103,7 +103,7 @@ def register_donor(request):
         form = DonorRegisterForm()
     return render(request, 'auth/register_donor.html', {'form': form})
 
-# --- 3. STUDENT VIEWS ---
+# 3. STUDENT VIEWS 
 @login_required
 def student_dashboard(request):
     if request.user.role != 'student':
@@ -246,7 +246,7 @@ def skill_writing(request):
         return redirect('myapp:student_dashboard')
     return render(request, "student/skill_writing.html")
 
-# --- 4. CLIENT VIEWS ---
+# 4. CLIENT VIEWS 
 @login_required
 def client_dashboard(request):
     if request.user.role != 'client':
@@ -387,6 +387,21 @@ def pay_for_job(request, job_id):
 
     return render(request, "client/pay_for_job.html", {"job": job})
 
+#   Job Delete View 
+@login_required
+def job_delete(request, pk):
+    # Ensure only the client who posted it can delete it
+    job = get_object_or_404(Job, pk=pk, client=request.user)
+    
+    # Prevent deleting active jobs (Safety check)
+    if job.status in ['assigned', 'completed']:
+        messages.error(request, "Cannot delete a gig that is in progress or completed.")
+        return redirect('myapp:client_dashboard')
+        
+    job.delete()
+    messages.success(request, "Gig deleted successfully.")
+    return redirect('myapp:client_dashboard')
+
 # --- 5. DONOR VIEWS ---
 @login_required
 def donor_dashboard(request):
@@ -418,7 +433,7 @@ def donate(request):
         # 2. Create Payment Record (Linked to Donation)
         payment = Payment.objects.create(
             payer=request.user,
-            beneficiary=None, # Correct: Donations have no specific student beneficiary
+            beneficiary=None, 
             purpose='DONATION',
             amount=amount,
             donation=donation,
@@ -474,7 +489,7 @@ def donate_success(request):
     ).order_by('-date').first()
     return render(request, 'donor/donate_success.html', {'donation': last_donation})
 
-# --- 6. M-PESA CALLBACK ---
+# 6. M-PESA CALLBACK 
 @csrf_exempt
 def mpesa_confirmation(request):
     if request.method != 'POST':
@@ -534,7 +549,7 @@ def mpesa_confirmation(request):
         traceback.print_exc()
         return HttpResponse(status=400)
 
-# --- 7. ADMIN VIEWS ---
+#  7 ADMIN VIEWS 
 @login_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
@@ -561,7 +576,7 @@ def admin_dashboard(request):
         'pending_assessments_count': pending_assessments_count,
         'expired_gigs_count': expired_gigs_count,
         'pending_apps_count': pending_apps_count,
-        'my_posted_jobs': my_posted_jobs,  # Added this so the template can loop over it
+        'my_posted_jobs': my_posted_jobs,  
     }
     
     return render(request, 'custom_admin/dashboard.html', context)
