@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Terms of Service | ComradeGigs{% endblock %}
+
+{% block content %}
+
+<header class="py-5 bg-dark text-white text-center">
+    <div class="container">
+        <h1 class="fw-bold">Terms of Service</h1>
+        <p class="lead opacity-75">Effective Date: {% now "F j, Y" %}</p>
+    </div>
+</header>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 bg-white p-5 rounded-4 shadow-sm">
+                
+                <h4 class="fw-bold mb-3">1. Introduction</h4>
+                <p class="text-secondary mb-4">
+                    Welcome to ComradeGigs. By accessing or using our website, you agree to be bound by these Terms. If you do not agree, please do not use the platform.
+                </p>
+
+                <h4 class="fw-bold mb-3">2. User Eligibility</h4>
+                <ul class="text-secondary mb-4">
+                    <li><strong>Students:</strong> Must be currently enrolled in a recognized university or college in Kenya. You must provide a valid School ID for verification.</li>
+                    <li><strong>Clients:</strong> Must be at least 18 years old and legally capable of entering into contracts.</li>
+                    <li><strong>Donors:</strong> Donations are voluntary and non-refundable.</li>
+                </ul>
+
+                <h4 class="fw-bold mb-3">3. Fees and Payments</h4>
+                <p class="text-secondary mb-2">
+                    <strong>Service Fee:</strong> ComradeGigs charges a flat <strong>5% service fee</strong> on all completed gigs to cover maintenance and security costs. This is deducted automatically from the Student's payout.
+                </p>
+                <p class="text-secondary mb-4">
+                    <strong>M-Pesa:</strong> All payments are processed via M-Pesa. You agree to provide accurate phone numbers. ComradeGigs is not responsible for funds sent to wrong numbers due to user error.
+                </p>
+
+                <h4 class="fw-bold mb-3 text-danger">4. Prohibited Conduct (Zero Tolerance)</h4>
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 rounded-3 mb-4">
+                    <p class="mb-0 small">
+                        <strong>Off-Platform Payments:</strong> Taking a client/student off ComradeGigs to pay via personal M-Pesa/Cash to avoid fees is strictly prohibited. Doing so waives all fraud protection and will result in an immediate account ban.
+                    </p>
+                </div>
+                <ul class="text-secondary mb-4">
+                    <li>Submitting fake or altered School IDs.</li>
+                    <li>Plagiarism or submitting work that is not yours.</li>
+                    <li>Harassment or abusive language towards other users.</li>
+                </ul>
+
+                <h4 class="fw-bold mb-3">5. Verification</h4>
+                <p class="text-secondary mb-4">
+                    We reserve the right to verify your identity using the School ID provided. Falsifying documents is a criminal offense and will be reported to relevant authorities.
+                </p>
+
+                <h4 class="fw-bold mb-3">6. Limitation of Liability</h4>
+                <p class="text-secondary mb-4">
+                    ComradeGigs is a facilitator. We are not an employer. We are not responsible for the quality of work provided by students, though we facilitate dispute resolution where possible.
+                </p>
+
+                <h4 class="fw-bold mb-3">7. Contact Us</h4>
+                <p class="text-secondary mb-0">
+                    If you have any questions about these Terms, please contact us at <a href="mailto:legal@comradegigs.com">legal@comradegigs.com</a>.
+                </p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

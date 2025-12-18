@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Post New Event | ComradeGigs{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light" style="min-height: 90vh;">
+  <div class="container">
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h2 class="fw-bold mb-0">Create New Event</h2>
+          <a href="{% url 'myapp:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill fw-bold">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+          </a>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-header bg-info bg-gradient text-white p-4">
+            <h5 class="fw-bold mb-0"><i class="bi bi-calendar-plus me-2"></i>Event Details</h5>
+          </div>
+          
+          <div class="card-body p-5">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Event Poster / Image</label>
+                <div class="input-group">
+                    <input type="file" name="image" class="form-control form-control-lg bg-light border-0" accept="image/*">
+                    <span class="input-group-text bg-white border-0"><i class="bi bi-image text-muted"></i></span>
+                </div>
+                <div class="form-text">Recommended size: 1200x600px (Landscape)</div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Event Title</label>
+                <input type="text" name="title" class="form-control form-control-lg bg-light border-0" placeholder="e.g. Campus Tech Meetup 2025" value="{{ form.title.value|default:'' }}" required>
+              </div>
+
+              <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Date & Time</label>
+                  <input type="datetime-local" name="date" class="form-control form-control-lg bg-light border-0" value="{{ form.date.value|date:'Y-m-d\TH:i' }}" required>
+                </div>
+                
+                <div class="col-md-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Location / Venue</label>
+                  <input type="text" name="location" class="form-control form-control-lg bg-light border-0" placeholder="e.g. Student Center Hall A" value="{{ form.location.value|default:'' }}" required>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Description</label>
+                <textarea name="description" class="form-control bg-light border-0" rows="5" placeholder="What is this event about?" required>{{ form.description.value|default:'' }}</textarea>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-info text-white btn-lg rounded-pill fw-bold shadow-sm">
+                  Publish Event <i class="bi bi-send-fill ms-2"></i>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

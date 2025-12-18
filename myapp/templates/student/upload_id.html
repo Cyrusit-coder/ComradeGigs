@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-5 bg-light" style="min-height: 80vh;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-lg rounded-4">
+          <div class="card-header bg-dark text-white p-4">
+            <h4 class="fw-bold mb-0"><i class="bi bi-person-badge-fill me-2"></i>Verify Student Identity</h4>
+          </div>
+          <div class="card-body p-5">
+            <p class="text-secondary mb-4">
+                To ensure platform safety, please upload a clear picture of your <strong>University/College ID</strong>. 
+                Admins will verify this before you can browse gigs.
+            </p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill fw-bold w-100 py-2">
+                    Upload ID for Verification
+                </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

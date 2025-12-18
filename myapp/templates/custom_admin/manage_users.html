@@ -4,12 +4,14 @@
 {% block title %}Manage Users | ComradeGigs{% endblock %}
 
 {% block content %}
-     <!-- admin user management page -->
 <section class="py-5 bg-light">
   <div class="container">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="fw-bold mb-0">User Management</h3>
+      <div>
+          <h3 class="fw-bold mb-0">User Management</h3>
+          <p class="text-secondary mb-0">Verify identities and manage access.</p>
+      </div>
       <div class="d-flex gap-2">
         <input type="text" class="form-control rounded-pill border-0 shadow-sm" placeholder="Search username..." style="width: 250px;">
         <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Search</button>
@@ -21,10 +23,10 @@
         <table class="table table-hover mb-0 align-middle">
           <thead class="bg-dark text-white">
             <tr>
-              <th class="py-3 ps-4">Username</th>
+              <th class="py-3 ps-4">User Details</th>
               <th class="py-3">Role</th>
-              <th class="py-3">Joined</th>
-              <th class="py-3">Status</th>
+              <th class="py-3 text-center">Status</th>
+              <th class="py-3 text-center">Verification</th>
               <th class="py-3 text-end pe-4">Actions</th>
             </tr>
           </thead>
@@ -33,66 +35,131 @@
             <tr>
               <td class="ps-4">
                 <div class="d-flex align-items-center">
-                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 35px; height: 35px;">
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 text-primary shadow-sm" style="width: 40px; height: 40px;">
                     {{ user.username|slice:":1"|upper }}
                   </div>
                   <div>
                     <div class="fw-bold text-dark">{{ user.username }}</div>
                     <div class="small text-muted">{{ user.email }}</div>
+                    <div class="small text-secondary" style="font-size: 0.75rem;">Joined: {{ user.date_joined|date:"M d, Y" }}</div>
                   </div>
                 </div>
               </td>
+              
               <td>
                 {% if user.role == 'student' %}
-                  <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill">Student</span>
+                  <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-3">Student</span>
                 {% elif user.role == 'client' %}
-                  <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill">Client</span>
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3">Client</span>
                 {% elif user.role == 'donor' %}
-                  <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill">Donor</span>
-                {% endif %}
-              </td>
-              <td class="text-secondary small">{{ user.date_joined|date:"M d, Y" }}</td>
-              <td>
-                {% if user.is_active %}
-                  <span class="badge bg-success rounded-pill">Active</span>
+                  <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-3">Donor</span>
                 {% else %}
-                  <span class="badge bg-secondary rounded-pill">Banned</span>
+                   <span class="badge bg-dark rounded-pill px-3">Admin</span>
                 {% endif %}
               </td>
+
+              <td class="text-center">
+                {% if user.is_active %}
+                  <span class="badge bg-success rounded-pill"><i class="bi bi-check-circle me-1"></i>Active</span>
+                {% else %}
+                  <span class="badge bg-danger rounded-pill"><i class="bi bi-slash-circle me-1"></i>Banned</span>
+                {% endif %}
+              </td>
+
+              <td class="text-center">
+                  {% if user.role == 'student' %}
+                      <div class="d-flex flex-column gap-1 align-items-center">
+                          {% if user.student_profile.is_id_verified %}
+                             <span class="badge bg-primary rounded-pill"><i class="bi bi-person-badge me-1"></i>ID Verified</span>
+                          {% else %}
+                             <span class="badge bg-warning text-dark rounded-pill">ID Pending</span>
+                             {% if user.student_profile.school_id_image %}
+                                <a href="{{ user.student_profile.school_id_image.url }}" target="_blank" class="small text-primary text-decoration-underline fw-bold mt-1">View ID Card</a>
+                             {% else %}
+                                <span class="small text-muted" style="font-size: 0.7rem;">(No Upload)</span>
+                             {% endif %}
+                          {% endif %}
+
+                          {% if user.student_profile.is_skill_verified %}
+                             <span class="badge bg-info text-dark rounded-pill mt-1" style="font-size: 0.65rem;"><i class="bi bi-star-fill me-1"></i>Skills OK</span>
+                          {% endif %}
+                      </div>
+                  {% else %}
+                      {% if user.is_verified %}
+                        <span class="badge bg-primary rounded-pill"><i class="bi bi-shield-fill-check me-1"></i>Verified</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+                      {% endif %}
+                  {% endif %}
+              </td>
+
               <td class="text-end pe-4">
-                <div class="btn-group">
-                  <a href="#" class="btn btn-sm btn-outline-secondary rounded-start fw-bold">Edit</a>
+                <div class="d-flex justify-content-end gap-2">
                   
-                  <form method="post" action="{% url 'myapp:admin_ban_user' user.id %}" onsubmit="return confirm('Are you sure you want to change this user\'s status?');">
+                  {% if user.role != 'admin' %}
+                      <form method="post" action="{% url 'myapp:admin_verify_user' user.id %}">
+                        {% csrf_token %}
+                        
+                        {% if user.role == 'student' %}
+                            {% if user.student_profile.is_id_verified %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill" title="Revoke ID Verification">
+                                    <i class="bi bi-x-lg"></i> Unverify
+                                </button>
+                            {% else %}
+                                {% if user.student_profile.school_id_image %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" title="Approve Student ID">
+                                        <i class="bi bi-check2-all"></i> Verify ID
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-sm btn-light text-muted rounded-pill" disabled title="No ID Uploaded">
+                                        Wait Upload
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                        
+                        {% else %}
+                            {% if user.is_verified %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill" title="Revoke Verification">
+                                    <i class="bi bi-x-circle"></i> Unverify
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" title="Verify User">
+                                    <i class="bi bi-check2-all"></i> Verify
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                      </form>
+                  {% endif %}
+
+                  <form method="post" action="{% url 'myapp:admin_ban_user' user.id %}" onsubmit="return confirm('Are you sure you want to change access for this user?');">
                     {% csrf_token %}
                     {% if user.is_active %}
-                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-end fw-bold">
-                        <i class="bi bi-slash-circle"></i> Ban
+                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Ban User">
+                        <i class="bi bi-slash-circle"></i>
                       </button>
                     {% else %}
-                      <button type="submit" class="btn btn-sm btn-success rounded-end fw-bold">
-                        <i class="bi bi-check-circle"></i> Unban
+                      <button type="submit" class="btn btn-sm btn-success rounded-pill" title="Unban User">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                       </button>
                     {% endif %}
                   </form>
-                  
+
                 </div>
               </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-5 text-muted">No users found.</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       
-      <div class="card-footer bg-white py-3">
-        <nav>
-          <ul class="pagination justify-content-center mb-0">
-            <li class="page-item disabled"><a class="page-link rounded-start-pill" href="#">Previous</a></li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link rounded-end-pill" href="#">Next</a></li>
-          </ul>
-        </nav>
+      <div class="card-footer bg-white py-3 border-0">
+        <div class="d-flex justify-content-center">
+            <small class="text-muted">Showing {{ users.count }} users</small>
+        </div>
       </div>
 
     </div>

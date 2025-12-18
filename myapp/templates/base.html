@@ -4,6 +4,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}"> 
+    
     <title>{% block title %}ComradeGigs | Empowering Campus Talent{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -49,8 +52,7 @@
   </head>
 
   <body class="d-flex flex-column min-vh-100 bg-light">
-     <!-- nav bar starts -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-comrade shadow sticky-top py-3">
+     <nav class="navbar navbar-expand-lg navbar-dark navbar-comrade shadow sticky-top py-3">
       <div class="container">
         
         <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-warning" href="{% url 'myapp:home' %}">
@@ -68,17 +70,24 @@
             <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:home' %}">Home</a></li>
             <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:about' %}">About</a></li>
             <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:events' %}">Events</a></li>
-            <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:job_list' %}">Browse Gigs</a></li>
-            <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:donate' %}">Donate</a></li>
-            <!-- only logined in users -->
+            
             {% if user.is_authenticated %}
-            <!-- student nav bar part -->
-              {% if user.role == 'student' %}
+                {% if user.is_superuser %}
+                    <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:job_list' %}">Browse Gigs</a></li>
+                {% elif user.role == 'student' and user.studentprofile.is_verified %}
+                    <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:job_list' %}">Browse Gigs</a></li>
+                {% elif user.role == 'client' and user.is_verified %}
+                    <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:job_list' %}">Browse Gigs</a></li>
+                {% endif %}
+            {% endif %}
+            <li class="nav-item"><a class="nav-link px-3 fw-semibold" href="{% url 'myapp:donate' %}">Donate</a></li>
+            
+            {% if user.is_authenticated %}
+            {% if user.role == 'student' %}
                 <li class="nav-item border-start border-white border-opacity-25 ms-2 ps-2">
                     <a class="nav-link fw-semibold text-warning" href="{% url 'myapp:learn_skills' %}"><i class="bi bi-lightning-fill"></i> Learn Skills</a>
                 </li>
-                <!-- client nav bar part -->
-              {% elif user.role == 'client' %}
+                {% elif user.role == 'client' %}
                 <li class="nav-item border-start border-white border-opacity-25 ms-2 ps-2">
                     <a class="nav-link fw-semibold text-warning" href="{% url 'myapp:client_dashboard' %}">My Jobs</a>
                 </li>
@@ -88,7 +97,6 @@
           </ul>
 
           <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
-            <!-- dark mode part -->
             <li class="nav-item me-2">
               <button class="btn btn-sm btn-outline-light rounded-circle border-0" id="darkModeToggle" title="Toggle Night Mode"><i class="bi bi-moon-fill"></i></button>
             </li>
@@ -96,14 +104,12 @@
             {% if user.is_authenticated %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
-                  <!-- circular user avatar  that displays the first letter in uppercase. -->
                   <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold small" style="width: 35px; height: 35px;">
                     {{ user.username|slice:":1"|upper }}
                   </div>
                   
                   <span class="text-white small fw-bold">{{ user.username }}</span>
-                   <!-- different dashboard of the users -->
-                  {% if user.role == 'student' %}
+                   {% if user.role == 'student' %}
                     <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.65rem;">Student</span>
                   {% elif user.role == 'client' %}
                     <span class="badge bg-success text-white rounded-pill" style="font-size: 0.65rem;">Client</span>
@@ -125,8 +131,7 @@
                         </a>
                     </li>
                   {% endif %}
-                     <!-- dashboard of diff users -->
-                  <li>
+                      <li>
                     {% if user.role == 'student' %}
                         <a class="dropdown-item rounded-2" href="{% url 'myapp:student_dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
                     {% elif user.role == 'client' %}
@@ -163,8 +168,7 @@
         </div>
       </div>
     </nav>
-      <!-- notification system sent by django site -->
-    <div class="container mt-4">
+      <div class="container mt-4">
       {% if messages %}
         {% for message in messages %}
           <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 rounded-4 d-flex align-items-center" role="alert">
@@ -175,11 +179,9 @@
         {% endfor %}
       {% endif %}
     </div>
-    <!-- unique content -->
     <main class="flex-grow-1">
       {% block content %}{% endblock %}
     </main>
-    <!-- footer starts -->
     <footer class="bg-dark text-white mt-5 pt-5 pb-3">
       <div class="container">
         <div class="row gy-4">
@@ -203,7 +205,11 @@
             <ul class="list-unstyled small d-flex flex-column gap-2">
               <li><a href="{% url 'myapp:about' %}" class="text-white text-decoration-none opacity-75 hover-opacity-100 transition">About Us</a></li>
               <li><a href="{% url 'myapp:faqs' %}" class="text-white text-decoration-none opacity-75 hover-opacity-100 transition">FAQs</a></li>
-              <li><a href="{% url 'myapp:job_list' %}" class="text-white text-decoration-none opacity-75 hover-opacity-100 transition">Browse Gigs</a></li>
+              {% if user.is_authenticated %}
+                {% if user.is_superuser or user.role == 'student' and user.studentprofile.is_verified or user.role == 'client' and user.is_verified %}
+                  <li><a href="{% url 'myapp:job_list' %}" class="text-white text-decoration-none opacity-75 hover-opacity-100 transition">Browse Gigs</a></li>
+                {% endif %}
+              {% endif %}
               <li><a href="{% url 'myapp:donate' %}" class="text-white text-decoration-none opacity-75 hover-opacity-100 transition">Donate to a Comrade</a></li>
               <li><a href="{% url 'myapp:contact' %}" class="text-white text-decoration-none opacity-75 hover-opacity-100 transition">Contact Support</a></li>
             </ul>
@@ -224,6 +230,9 @@
               <a href="https://linkedin.com" target="_blank" class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                 <i class="bi bi-linkedin"></i>
               </a>
+              <a href="https://whatsapp.com/channel/0029Vb7l5He3rZZdfyskEv0s" target="_blank" class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="bi bi-whatsapp"></i>
+              </a>
             </div>
             
             <div class="p-3 bg-white bg-opacity-10 rounded-3 border border-secondary border-opacity-50">
@@ -236,21 +245,27 @@
 
         <hr class="my-5 border-secondary opacity-50">
 
-        <div class="row align-items-center">
+        <div class="row align-items-center gy-3">
           <div class="col-md-6 text-center text-md-start">
-            <p class="small opacity-50 mb-0">&copy; {% now "Y" %} ComradeGigs Inc. Built by CYRUS NJERI.</p>
+            <div class="d-flex flex-column flex-md-row align-items-center gap-2">
+                <p class="small opacity-50 mb-0">&copy; {% now "Y" %} ComradeGigs Inc. Built by CYRUS NJERI.</p>
+                <div class="d-flex gap-2 ms-md-2">
+                    <a href="https://wa.me/254737855126" target="_blank" class="text-white opacity-50 hover-opacity-100 transition" title="WhatsApp Me"><i class="bi bi-whatsapp"></i></a>
+                    <a href="https://x.com/DeHamper2" target="_blank" class="text-white opacity-50 hover-opacity-100 transition" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61556808732824" target="_blank" class="text-white opacity-50 hover-opacity-100 transition" title="Facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="https://www.linkedin.com/in/cyrus-njeri-15896936b/" target="_blank" class="text-white opacity-50 hover-opacity-100 transition" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
           </div>
           <div class="col-md-6 text-center text-md-end">
-            <a href="#" class="text-white opacity-50 small text-decoration-none me-3">Privacy Policy</a>
-            <a href="#" class="text-white opacity-50 small text-decoration-none">Terms of Service</a>
+            <a href="{% url 'myapp:privacy' %}" class="text-white opacity-50 small text-decoration-none me-3 hover-opacity-100">Privacy Policy</a>
+            <a href="{% url 'myapp:terms' %}" class="text-white opacity-50 small text-decoration-none hover-opacity-100">Terms of Service</a>
           </div>
         </div>
 
       </div>
     </footer>
-            <!-- end of footer -->
-             <!-- js files -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {

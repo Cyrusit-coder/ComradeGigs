@@ -4,51 +4,122 @@
 {% block title %}Contact Us | ComradeGigs{% endblock %}
 
 {% block content %}
-     <!-- contact us page -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+
+<header class="py-5 bg-dark text-white text-center position-relative overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-10" style="background: linear-gradient(45deg, #0d6efd, #000);"></div>
+    <div class="container position-relative z-1">
+        <h1 class="fw-bold display-5 mb-3">Let's Connect</h1>
+        <p class="lead opacity-75 mx-auto" style="max-width: 600px;">
+            Have a question, feedback, or just want to say hi? We're here to help students and clients succeed together.
+        </p>
+    </div>
+</header>
+
+<section class="py-5 bg-light" style="min-height: 80vh;">
+  <div class="container mt-n5">
+    
+    <div class="card border-0 shadow-lg rounded-5 overflow-hidden mt-n5 position-relative z-2" style="margin-top: -80px;">
       <div class="row g-0">
         
-        <div class="col-lg-5 bg-primary bg-gradient text-white p-5 d-flex flex-column justify-content-center">
-          <h2 class="fw-bold mb-4">Get in Touch</h2>
-          <p class="mb-5 text-white-50 fs-5">
-            Have questions about gigs, skills, or donations? We are here to help comrades succeed.
-          </p>
-          <div class="d-flex flex-column gap-4">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-envelope-fill fs-4 me-3 text-warning"></i>
-                <span class="fw-bold">hello@comradegigs.com</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <i class="bi bi-telephone-fill fs-4 me-3 text-warning"></i>
-                <span class="fw-bold">+254 700 800 000</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <i class="bi bi-geo-alt-fill fs-4 me-3 text-warning"></i>
-                <span class="fw-bold">Nairobi, Kenya</span>
+        <div class="col-lg-5 bg-primary bg-gradient text-white p-5 d-flex flex-column justify-content-between position-relative overflow-hidden">
+          
+          <div class="position-relative z-1">
+              <h3 class="fw-bold mb-4">Contact Information</h3>
+              <p class="mb-5 text-white-50">
+                Reach out to us directly. We typically reply within 24 hours.
+              </p>
+              
+              <div class="d-flex flex-column gap-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-envelope-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <span class="d-block small text-white-50 text-uppercase fw-bold">Email</span>
+                        <a href="mailto:hello@comradegigs.com" class="text-white text-decoration-none fw-bold fs-5 hover-underline">hello@comradegigs.com</a>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-telephone-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <span class="d-block small text-white-50 text-uppercase fw-bold">Phone</span>
+                        <a href="tel:+254700800000" class="text-white text-decoration-none fw-bold fs-5 hover-underline">+254 737 855 126</a>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-geo-alt-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <span class="d-block small text-white-50 text-uppercase fw-bold">HQ Location</span>
+                        <span class="fw-bold fs-5">Nairobi, Kenya</span>
+                    </div>
+                </div>
+              </div>
+          </div>
+
+          <div class="mt-5 position-relative z-1">
+            <h6 class="text-uppercase text-white-50 small fw-bold mb-3">Follow Our Hustle</h6>
+            <div class="d-flex gap-3">
+                <a href="#" class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center social-icon-btn" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center social-icon-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center social-icon-btn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                <a href="https://whatsapp.com/channel/0029Vb7l5He3rZZdfyskEv0s" target="_blank" class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center social-icon-btn" title="WhatsApp Channel"><i class="bi bi-whatsapp"></i></a>
             </div>
           </div>
+
         </div>
 
         <div class="col-lg-7 bg-white p-5">
-          <h3 class="fw-bold text-dark mb-4">Send us a Message</h3>
-          <form>
-            <div class="row g-3">
+          <h3 class="fw-bold text-dark mb-2">Send us a Message</h3>
+          <p class="text-muted mb-4 small">Fields marked with <span class="text-danger">*</span> are required.</p>
+          
+          <form method="post">
+            {% csrf_token %}
+            <div class="row g-4">
               <div class="col-md-6">
-                <label class="form-label small fw-bold text-secondary">Name</label>
-                <input type="text" class="form-control bg-light border-0 py-2">
+                <label class="form-label small fw-bold text-secondary">Your Name <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
+                    <input type="text" name="name" class="form-control bg-light border-0 py-2" placeholder="e.g. Victor Mwangi" required>
+                </div>
               </div>
               <div class="col-md-6">
-                <label class="form-label small fw-bold text-secondary">Email</label>
-                <input type="email" class="form-control bg-light border-0 py-2">
+                <label class="form-label small fw-bold text-secondary">Email Address <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-envelope"></i></span>
+                    <input type="email" name="email" class="form-control bg-light border-0 py-2" placeholder="e.g. victormwangi@gmail.com" required>
+                </div>
               </div>
+              
               <div class="col-12">
-                <label class="form-label small fw-bold text-secondary">Message</label>
-                <textarea class="form-control bg-light border-0 py-2" rows="4"></textarea>
+                <label class="form-label small fw-bold text-secondary">Subject <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-chat-square-text"></i></span>
+                    <select class="form-select bg-light border-0 py-2 text-secondary" required>
+                        <option value="" selected disabled>Select a topic...</option>
+                        <option value="support">Technical Support</option>
+                        <option value="billing">Payment & Billing</option>
+                        <option value="verification">Account Verification</option>
+                        <option value="partnership">Partnership & Events</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
               </div>
+
               <div class="col-12">
-                <button class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Send Message</button>
+                <label class="form-label small fw-bold text-secondary">Message <span class="text-danger">*</span></label>
+                <textarea name="message" class="form-control bg-light border-0 py-2 rounded-3" rows="5" placeholder="How can we help you today?" required></textarea>
+              </div>
+              
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm w-100 w-md-auto hover-lift">
+                    Send Message <i class="bi bi-send-fill ms-2"></i>
+                </button>
               </div>
             </div>
           </form>
@@ -56,6 +127,76 @@
 
       </div>
     </div>
+
+    <div class="row mt-5 g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255281.19036281522!2d36.70730727823796!3d-1.3031933719272915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d49a7%3A0xf7cf0254b297924c!2sNairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske" 
+                    width="100%" 
+                    height="350" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 bg-warning bg-opacity-10 p-4 h-100">
+                <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-question-circle-fill me-2"></i>Quick Answers</h4>
+                <div class="d-flex flex-column gap-3">
+                    <a href="{% url 'myapp:faqs' %}" class="d-flex justify-content-between align-items-center text-decoration-none bg-white p-3 rounded-3 shadow-sm text-dark hover-lift">
+                        <span class="fw-bold small">How do I verify my account?</span>
+                        <i class="bi bi-chevron-right text-warning"></i>
+                    </a>
+                    <a href="{% url 'myapp:faqs' %}" class="d-flex justify-content-between align-items-center text-decoration-none bg-white p-3 rounded-3 shadow-sm text-dark hover-lift">
+                        <span class="fw-bold small">Is there a registration fee?</span>
+                        <i class="bi bi-chevron-right text-warning"></i>
+                    </a>
+                    <a href="{% url 'myapp:faqs' %}" class="d-flex justify-content-between align-items-center text-decoration-none bg-white p-3 rounded-3 shadow-sm text-dark hover-lift">
+                        <span class="fw-bold small">How do payments work?</span>
+                        <i class="bi bi-chevron-right text-warning"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
   </div>
 </section>
+
+<style>
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+    .social-icon-btn {
+        width: 45px;
+        height: 45px;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
+    }
+    .social-icon-btn:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+    }
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    /* Input group focus state for cleaner look */
+    .form-control:focus {
+        box-shadow: none;
+        background-color: #fff;
+    }
+    .input-group:focus-within {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        border-radius: 0.375rem;
+    }
+</style>
+
 {% endblock %}

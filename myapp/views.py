@@ -11,17 +11,18 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
 
-# Safe Import for M-Pesa (prevents crash if library missing)
+# Safe Import for M-Pesa
 try:
     from .mpesa import stk_push
 except ImportError:
     stk_push = None
     print("WARNING: 'requests' library not found. M-Pesa functions will fail.")
 
-from .models import User, Job, Application, Donation, StudentProfile, Skill, SkillSubmission, Payment
+from .models import User, Job, Application, Donation, StudentProfile, Skill, SkillSubmission, Payment, Event, SiteUpdate
 from .forms import (
     StudentRegisterForm, ClientRegisterForm, DonorRegisterForm, 
-    JobForm, StudentProfileForm, DonationForm
+    JobForm, StudentProfileForm, DonationForm, EventForm, 
+    ApplicationForm, SiteUpdateForm, StudentIDUploadForm 
 )
 
 # 1. PUBLIC PAGES
@@ -32,15 +33,27 @@ def about(request):
     return render(request, 'pages/about.html')
 
 def events(request):
-    return render(request, 'pages/events.html')
+    events = Event.objects.all().order_by('date')
+    return render(request, 'pages/events.html', {'events': events})
 
 def contact(request):
+    # Optional: Handle form submission for contact page
+    if request.method == 'POST':
+        messages.success(request, "Message sent! We'll get back to you shortly.")
+        return redirect('myapp:contact')
     return render(request, 'pages/contact.html')
 
 def faqs(request):
     return render(request, 'pages/faqs.html')
 
-#2. AUTHENTICATION 
+# --- NEW: Terms & Privacy Views ---
+def terms_of_service(request):
+    return render(request, 'pages/terms.html')
+
+def privacy_policy(request):
+    return render(request, 'pages/privacy.html')
+
+# 2. AUTHENTICATION 
 def login_view(request):
     from django.contrib.auth.views import LoginView
     
@@ -85,7 +98,7 @@ def register_client(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Client account created. Post a gig now!")
+            messages.success(request, "Client account created. Please wait for admin verification.")
             return redirect('myapp:client_dashboard')
     else:
         form = ClientRegisterForm()
@@ -112,53 +125,101 @@ def student_dashboard(request):
     apps = request.user.my_applications.all().order_by('-created_at')[:5]
     active_jobs_list = request.user.assigned_jobs.filter(status='assigned').order_by('deadline')
     
-    # Calculate Earnings (Jobs marked completed)
     earnings_data = request.user.assigned_jobs.filter(status='completed').aggregate(Sum('budget'))
     total_earnings = earnings_data['budget__sum'] or 0
+    
+    # Get Announcements for Students
+    site_updates = SiteUpdate.objects.filter(
+        is_active=True, 
+        audience__in=['all', 'student']
+    ).order_by('-created_at')[:3]
     
     context = {
         'my_apps': apps,
         'active_jobs_count': active_jobs_list.count(),
         'active_jobs_list': active_jobs_list, 
-        'total_earnings': total_earnings,     
+        'total_earnings': total_earnings,
+        'site_updates': site_updates, 
     }
     return render(request, 'student/dashboard.html', context)
 
+# Student Upload ID View
+@login_required
+def upload_school_id(request):
+    if request.user.role != 'student':
+        return redirect('myapp:home')
+        
+    profile = request.user.student_profile
+    
+    if request.method == 'POST':
+        form = StudentIDUploadForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "School ID uploaded! Waiting for Admin verification.")
+            return redirect('myapp:student_dashboard')
+    else:
+        form = StudentIDUploadForm(instance=profile)
+        
+    return render(request, 'student/upload_id.html', {'form': form})
+
+@login_required
 def job_list(request):
+    # Security Check: Restrict Access
+    if request.user.role == 'student':
+        profile = request.user.student_profile
+        
+        # 1. Check ID Verification
+        if not profile.is_id_verified:
+            messages.error(request, "Please upload your School ID and wait for verification first.")
+            return redirect('myapp:student_dashboard')
+            
+        # 2. Check Skill Verification
+        if not profile.is_skill_verified:
+            messages.error(request, "You must pass a skill assessment to browse gigs.")
+            return redirect('myapp:student_dashboard')
+
+    elif request.user.role == 'client' and not request.user.is_verified:
+        messages.error(request, "Your account is pending verification.")
+        return redirect('myapp:client_dashboard')
+
+    # If checks pass, show jobs
     jobs = Job.objects.filter(status='open').order_by('-created_at')
     query = request.GET.get('q')
     if query:
         jobs = jobs.filter(title__icontains=query)
     return render(request, 'student/job_list.html', {'jobs': jobs})
 
+@login_required
 def job_detail(request, pk):
     job = get_object_or_404(Job, pk=pk)
     
     if request.method == 'POST':
-        if not request.user.is_authenticated:
-            messages.error(request, "Please login to apply.")
-            return redirect('myapp:login')
-            
         if request.user.role != 'student':
             messages.error(request, "Only Student accounts can apply.")
             return redirect('myapp:job_detail', pk=pk)
 
-        cover_letter = request.POST.get('cover_letter')
+        # Check verification
+        if not request.user.student_profile.is_skill_verified:
+             messages.error(request, "You must be verified to apply.")
+             return redirect('myapp:job_detail', pk=pk)
 
         if Application.objects.filter(job=job, student=request.user).exists():
             messages.warning(request, "You have already applied for this gig!")
         else:
-            Application.objects.create(
-                job=job, 
-                student=request.user, 
-                cover_letter=cover_letter,
-                bid_amount=job.budget
-            )
-            messages.success(request, "Application sent successfully!")
+            form = ApplicationForm(request.POST, request.FILES)
+            if form.is_valid():
+                app = form.save(commit=False)
+                app.job = job
+                app.student = request.user
+                app.save()
+                messages.success(request, "Application sent successfully!")
+            else:
+                messages.error(request, "Error submitting application. Check file types/sizes.")
         
         return redirect('myapp:job_detail', pk=pk)
-            
-    return render(request, 'student/job_detail.html', {'job': job})
+    
+    form = ApplicationForm()
+    return render(request, 'student/job_detail.html', {'job': job, 'form': form})
 
 @login_required
 def profile_edit(request):
@@ -263,19 +324,28 @@ def client_dashboard(request):
     ).count()
     completed_gigs_count = jobs.filter(status='completed').count()
     
+    # Get Announcements for Clients
+    site_updates = SiteUpdate.objects.filter(
+        is_active=True, 
+        audience__in=['all', 'client']
+    ).order_by('-created_at')[:3]
+    
     context = {
         'jobs': jobs,
         'active_jobs_count': active_jobs_count,
         'applicants_reviewing_count': applicants_reviewing_count,
         'completed_gigs_count': completed_gigs_count,
+        'site_updates': site_updates, 
     }
     return render(request, 'client/dashboard.html', context)
 
 @login_required
 def job_create(request):
-    if request.user.role != 'client' and not request.user.is_superuser:
-        messages.error(request, "Access Denied. Only Clients can post gigs.")
-        return redirect('myapp:home')
+    # Only allow verified clients or superusers
+    if not request.user.is_superuser:
+        if request.user.role != 'client' or not request.user.is_verified:
+            messages.error(request, "Access Denied. Account verification required.")
+            return redirect('myapp:client_dashboard')
 
     if request.method == 'POST':
         form = JobForm(request.POST, request.FILES)
@@ -314,23 +384,46 @@ def job_edit(request, pk):
         form = JobForm(instance=job)
     return render(request, 'client/job_edit.html', {'form': form, 'job': job})
 
+# --- UPDATED: Applicant Review (Handles Hire & Reject) ---
 @login_required
 def applicant_review(request, job_id):
     job = get_object_or_404(Job, pk=job_id, client=request.user)
     
     if request.method == 'POST':
         app_id = request.POST.get('applicant_id')
+        action = request.POST.get('action') # Check which button was pressed
         application = get_object_or_404(Application, pk=app_id)
         
-        job.assigned_to = application.student
-        job.status = 'assigned'
-        job.save()
-        messages.success(request, f"You hired {application.student.username}!")
-        return redirect('myapp:client_dashboard')
+        if action == 'hire':
+            # Approve Application
+            application.status = 'accepted'
+            application.is_accepted = True
+            application.save()
+
+            # Reject Others
+            other_apps = job.applications.exclude(id=app_id)
+            other_apps.update(status='rejected', is_rejected=True)
+
+            # Update Job
+            job.assigned_to = application.student
+            job.status = 'assigned'
+            job.save()
+            
+            messages.success(request, f"You hired {application.student.username}!")
+            return redirect('myapp:client_dashboard')
+            
+        elif action == 'reject':
+            # Reject specific applicant
+            application.status = 'rejected'
+            application.is_rejected = True
+            application.save()
+            
+            messages.warning(request, "Applicant rejected.")
+            # Reload page to see remaining applicants
+            return redirect('myapp:applicant_review', job_id=job.id)
 
     return render(request, 'client/applicant_review.html', {'job': job})
 
-# CLIENT PAY FOR JOB (M-Pesa Integration)
 @login_required
 def pay_for_job(request, job_id):
     job = get_object_or_404(Job, id=job_id)
@@ -342,24 +435,18 @@ def pay_for_job(request, job_id):
         phone = request.POST.get("phone")
         amount = job.budget
 
-        # 1. Create Payment Record
         payment = Payment.objects.create(
             payer=request.user,
-            beneficiary=job.assigned_to, # Valid: Payment model has beneficiary
+            beneficiary=job.assigned_to,
             purpose='JOB',
             amount=amount,
             job=job,
             status='PENDING'
         )
 
-        # 2. Build Callback URL
         base_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000')
-        if "confirmation" in base_url:
-             callback_url = base_url
-        else:
-             callback_url = f"{base_url}/mpesa/confirmation"
+        callback_url = f"{base_url}/mpesa/confirmation" if "confirmation" not in base_url else base_url
 
-        # 3. Trigger STK Push
         if stk_push:
             resp = stk_push(
                 phone_number=phone,
@@ -371,10 +458,8 @@ def pay_for_job(request, job_id):
         else:
             resp = {"error": "M-Pesa library not loaded"}
 
-        # 4. Handle Response
         if "ResponseCode" in resp and resp["ResponseCode"] == "0":
-            checkout_request_id = resp.get("CheckoutRequestID")
-            payment.checkout_request_id = checkout_request_id
+            payment.checkout_request_id = resp.get("CheckoutRequestID")
             payment.save()
             messages.success(request, f"STK Push sent to {phone}. Check your phone to pay.")
         else:
@@ -387,13 +472,10 @@ def pay_for_job(request, job_id):
 
     return render(request, "client/pay_for_job.html", {"job": job})
 
-#   Job Delete View 
 @login_required
 def job_delete(request, pk):
-    # Ensure only the client who posted it can delete it
     job = get_object_or_404(Job, pk=pk, client=request.user)
     
-    # Prevent deleting active jobs (Safety check)
     if job.status in ['assigned', 'completed']:
         messages.error(request, "Cannot delete a gig that is in progress or completed.")
         return redirect('myapp:client_dashboard')
@@ -410,10 +492,17 @@ def donor_dashboard(request):
     total_contributed = total_data['amount__sum'] or 0
     comrades_supported = int(total_contributed / 500)
     
+    # Get Announcements for Donors
+    site_updates = SiteUpdate.objects.filter(
+        is_active=True, 
+        audience__in=['all', 'donor']
+    ).order_by('-created_at')[:3]
+    
     context = {
         'donations': donations,
         'total_contributed': total_contributed,
-        'comrades_supported': comrades_supported
+        'comrades_supported': comrades_supported,
+        'site_updates': site_updates, 
     }
     return render(request, 'donor/dashboard.html', context)
 
@@ -423,14 +512,12 @@ def donate(request):
         amount = request.POST.get('amount')
         phone = request.POST.get('phone')
 
-        # 1. Create Donation Record (NO BENEFICIARY FIELD HERE)
         donation = Donation.objects.create(
             donor=request.user,
             amount=amount,
             is_paid=False
         )
 
-        # 2. Create Payment Record (Linked to Donation)
         payment = Payment.objects.create(
             payer=request.user,
             beneficiary=None, 
@@ -440,14 +527,9 @@ def donate(request):
             status='PENDING'
         )
 
-        # 3. Build Callback URL
         base_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000')
-        if "confirmation" in base_url:
-             callback_url = base_url
-        else:
-             callback_url = f"{base_url}/mpesa/confirmation"
+        callback_url = f"{base_url}/mpesa/confirmation" if "confirmation" not in base_url else base_url
 
-        # 4. Trigger STK Push
         if stk_push:
             resp = stk_push(
                 phone_number=phone,
@@ -459,14 +541,11 @@ def donate(request):
         else:
             resp = {"error": "M-Pesa library not loaded"}
 
-        # 5. Handle Response
         if "ResponseCode" in resp and resp["ResponseCode"] == "0":
-            checkout_request_id = resp.get("CheckoutRequestID")
-            payment.checkout_request_id = checkout_request_id
+            payment.checkout_request_id = resp.get("CheckoutRequestID")
             payment.save()
             messages.success(request, f"STK Push sent to {phone}. Please confirm payment.")
             
-            # Show waiting screen
             return render(
                 request,
                 'donor/pay.html',
@@ -512,7 +591,6 @@ def mpesa_confirmation(request):
         payment.raw_callback = data
 
         if result_code == 0:
-            # SUCCESS
             items = stk_callback.get("CallbackMetadata", {}).get("Item", [])
             receipt = None
             for item in items:
@@ -524,22 +602,19 @@ def mpesa_confirmation(request):
             payment.mpesa_receipt = receipt
             payment.save()
 
-            # Update Donation Record
             if payment.purpose == 'DONATION' and payment.donation:
                 donation = payment.donation
                 donation.is_paid = True
                 donation.mpesa_code = receipt
                 donation.save()
 
-            # Update Job Record
             if payment.purpose == 'JOB' and payment.job:
                 job = payment.job
-                # Logic: Job is now paid for.
-                # You might want to update job status to 'completed' or 'paid' depending on your flow
+                # Job is now paid/completed
+                job.status = 'completed'
                 job.save()
 
         else:
-            # FAILED / CANCELLED
             payment.status = 'FAILED'
             payment.save()
 
@@ -549,16 +624,15 @@ def mpesa_confirmation(request):
         traceback.print_exc()
         return HttpResponse(status=400)
 
-#  7 ADMIN VIEWS 
+# 7. ADMIN VIEWS 
 @login_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('myapp:home')
     
-    # 1. Fetch Admin's Own Posted Gigs (For Payment Section)
     my_posted_jobs = Job.objects.filter(client=request.user).order_by('-created_at')
-
-    # 2. Fetch Platform-wide Stats
+    
+    # Platform Stats
     total_users_count = User.objects.count()
     pending_gigs_count = Job.objects.filter(status='review').count()
     pending_assessments_count = SkillSubmission.objects.filter(status='pending').count()
@@ -570,13 +644,19 @@ def admin_dashboard(request):
 
     pending_apps_count = Application.objects.filter(is_accepted=False, is_rejected=False).count()
     
+    # Events & Updates
+    events = Event.objects.all().order_by('date')
+    site_updates = SiteUpdate.objects.filter(is_active=True).order_by('-created_at')
+
     context = {
         'total_users_count': total_users_count,
         'pending_gigs_count': pending_gigs_count,
         'pending_assessments_count': pending_assessments_count,
         'expired_gigs_count': expired_gigs_count,
         'pending_apps_count': pending_apps_count,
-        'my_posted_jobs': my_posted_jobs,  
+        'my_posted_jobs': my_posted_jobs,
+        'events': events,
+        'site_updates': site_updates,
     }
     
     return render(request, 'custom_admin/dashboard.html', context)
@@ -632,6 +712,37 @@ def admin_ban_user(request, user_id):
     user_to_mod.save()
     return redirect('myapp:admin_users')
 
+# Admin Verify User (Handles Students, Clients, Donors)
+@login_required
+def admin_verify_user(request, user_id):
+    if not request.user.is_superuser:
+        return redirect('myapp:home')
+        
+    user_to_verify = get_object_or_404(User, pk=user_id)
+    
+    # 1. Student Verification Logic (Identity)
+    if user_to_verify.role == 'student':
+        profile = user_to_verify.student_profile
+        if profile.is_id_verified:
+            profile.is_id_verified = False
+            messages.warning(request, f"Student {user_to_verify.username} ID Unverified.")
+        else:
+            profile.is_id_verified = True
+            messages.success(request, f"Student {user_to_verify.username} ID Verified.")
+        profile.save()
+        
+    # 2. Client/Donor Verification Logic (Account)
+    else:
+        if user_to_verify.is_verified:
+            user_to_verify.is_verified = False
+            messages.warning(request, f"{user_to_verify.username} unverified.")
+        else:
+            user_to_verify.is_verified = True
+            messages.success(request, f"{user_to_verify.username} successfully verified.")
+        user_to_verify.save()
+        
+    return redirect('myapp:admin_users')
+
 @login_required
 def admin_stats(request):
     if not request.user.is_superuser:
@@ -664,10 +775,12 @@ def admin_approve_skill(request, submission_id):
             skill_obj, created = Skill.objects.get_or_create(name=submission.skill_name)
             profile.skills.add(skill_obj)
             
+            # Verify Skill Status
+            profile.is_skill_verified = True
             profile.badges_earned += 1
             profile.save()
             
-            messages.success(request, f"Skill approved! {submission.student.username} now has the {submission.skill_name} badge.")
+            messages.success(request, f"Skill approved! {submission.student.username} verified.")
             
         elif action == 'reject':
             submission.status = 'rejected'
@@ -723,6 +836,7 @@ def admin_process_application(request, app_id):
         action = request.POST.get('action')
         
         if action == 'approve':
+            application.status = 'accepted'
             application.is_accepted = True
             application.save()
             
@@ -731,13 +845,67 @@ def admin_process_application(request, app_id):
             job.save()
             
             other_apps = Application.objects.filter(job=job).exclude(id=application.id)
-            other_apps.update(is_rejected=True)
+            other_apps.update(status='rejected', is_rejected=True)
             
             messages.success(request, f"Application Approved. Job assigned to {application.student.username}.")
             
         elif action == 'reject':
+            application.status = 'rejected'
             application.is_rejected = True
             application.save()
             messages.warning(request, "Application Rejected.")
             
     return redirect('myapp:admin_manage_applications')
+
+@login_required
+def event_create(request):
+    if not request.user.is_superuser:
+        messages.error(request, "Access Denied.")
+        return redirect('myapp:home')
+    
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES) 
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event posted successfully!")
+            return redirect('myapp:admin_dashboard')
+    else:
+        form = EventForm()
+    
+    return render(request, 'custom_admin/event_create.html', {'form': form})
+
+@login_required
+def event_edit(request, pk):
+    if not request.user.is_superuser:
+        return redirect('myapp:home')
+        
+    event = get_object_or_404(Event, pk=pk)
+    
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event updated successfully.")
+            return redirect('myapp:admin_dashboard')
+    else:
+        form = EventForm(instance=event)
+        
+    return render(request, 'custom_admin/event_create.html', {'form': form})
+
+# --- Site Update Creation ---
+@login_required
+def create_site_update(request):
+    if not request.user.is_superuser:
+        return redirect('myapp:home')
+        
+    if request.method == 'POST':
+        form = SiteUpdateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Announcement Posted Successfully!")
+            return redirect('myapp:admin_dashboard')
+    else:
+        form = SiteUpdateForm()
+    
+    # Renders the new template instead of just redirecting
+    return render(request, 'custom_admin/create_update.html', {'form': form})

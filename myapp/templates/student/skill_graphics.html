@@ -1,108 +1,303 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Graphic Design Course | ComradeGigs{% endblock %}
+{% block title %}Graphic Design Masterclass | ComradeGigs{% endblock %}
 
 {% block content %}
-         <!-- graphic design course nd test -->
-<section class="py-5 bg-light">
+<section class="py-4 bg-light" style="min-height: 100vh;">
   <div class="container">
-    
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-8 text-center">
-        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 mb-3 fw-bold">
-          Skill Module: Graphic Design
-        </span>
-        <h2 class="fw-bolder text-dark mb-3">Design Basics & Assessment</h2>
-        <p class="text-secondary lead fs-6">
-          Read the short guide below, then complete the practical task. 
-          <br><strong>Admin will verify your work before giving you the badge.</strong>
-        </p>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 bg-danger text-white overflow-hidden position-relative">
+          <div class="position-absolute top-0 end-0 bg-white opacity-10 rounded-circle" style="width: 200px; height: 200px; margin-right: -50px; margin-top: -50px;"></div>
+          
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <div>
+                <h2 class="fw-bold mb-1">Graphic Design Masterclass</h2>
+                <p class="mb-0 opacity-75">Design like a pro, {{ user.username }}! Master Canva & Photoshop.</p>
+              </div>
+              <div class="text-end">
+                <h3 class="fw-bold mb-0" id="progress-text">0%</h3>
+                <span class="small opacity-75">Completed</span>
+              </div>
+            </div>
+            <div class="progress bg-white bg-opacity-25 rounded-pill" style="height: 10px;">
+              <div class="progress-bar bg-white rounded-pill" role="progressbar" style="width: 0%;" id="progress-bar"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        
-        <div class="card border-0 shadow-sm rounded-4 mb-5">
-          <div class="card-body p-5">
-            <h4 class="fw-bold text-danger mb-4"><i class="bi bi-book-half me-2"></i>Quick Study Guide</h4>
+    <div class="row g-4">
+      
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 sticky-top" style="top: 20px; z-index: 1;">
+          <div class="ratio ratio-16x9 bg-dark">
+            <iframe id="main-video" 
+                    src="" 
+                    title="Course Video" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+            </iframe>
+          </div>
+          <div class="card-body p-4">
             
-            <div class="row g-4">
-              <div class="col-md-6">
-                <h6 class="fw-bold">1. Standard Dimensions</h6>
-                <ul class="small text-secondary mb-4">
-                  <li><strong>Instagram Post:</strong> 1080 x 1080 px</li>
-                  <li><strong>Instagram Story:</strong> 1080 x 1920 px</li>
-                  <li><strong>A4 Poster:</strong> 210 x 297 mm</li>
-                </ul>
-                
-                <h6 class="fw-bold">2. Color Contrast</h6>
-                <p class="small text-secondary">
-                  Always ensure text is readable. Dark text on light backgrounds, or light text on dark backgrounds. Avoid yellow text on white!
-                </p>
-              </div>
-              
-              <div class="col-md-6 border-start-md">
-                <h6 class="fw-bold">3. Tools to Use</h6>
-                <p class="small text-secondary">
-                  You don't need Photoshop. Use <strong>Canva</strong> (free version) for most comrade gigs. It has templates for everything.
-                </p>
-
-                <h6 class="fw-bold">4. Deliverables</h6>
-                <p class="small text-secondary">
-                  Clients usually want a <strong>JPG/PNG</strong> for social media and a <strong>PDF</strong> for printing. Always ask before starting.
-                </p>
-              </div>
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1" id="video-title">Loading Lesson...</h4>
+                <p class="text-muted small mb-0" id="video-desc">Please wait.</p>
             </div>
-            
+
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="prevVideo()">
+                    <i class="bi bi-chevron-left me-1"></i> Previous
+                </button>
+
+                <button class="btn btn-danger btn-sm rounded-pill px-4 fw-bold shadow-sm" onclick="markAsComplete()">
+                    <i class="bi bi-check-circle-fill me-2"></i>Mark Complete
+                </button>
+
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="nextVideo()">
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                </button>
+            </div>
+
           </div>
         </div>
+      </div>
 
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="card-header bg-danger bg-gradient text-white p-4">
-            <h4 class="fw-bold mb-0"><i class="bi bi-pencil-fill me-2"></i>The Practical Test</h4>
+      <div class="col-lg-4">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="fw-bold mb-0">Course Curriculum</h6>
           </div>
-          <div class="card-body p-5">
+          
+          <div class="accordion accordion-flush" id="courseAccordion">
             
-            <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
-              <i class="bi bi-exclamation-circle-fill fs-4 me-3"></i>
-              <div>
-                <strong>Task:</strong> Design a simple "Welcome Back Party" poster for a campus event.
-                <br>Make sure to include: <em>Date, Time, Venue, and Entry Fee.</em>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  Module 1: Canva & Fundamentals
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(0)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Canva Basics</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(1)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Design Principles</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(2)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Color Theory</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(3)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Typography</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(4)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>5. Layout & Composition</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(5)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>6. Branding Basics</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <form method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">1. Paste your Canva/Drive Link (Optional)</label>
-                <input type="url" name="link" class="form-control form-control-lg bg-light border-0" placeholder="https://canva.com/design/...">
-              </div>
-
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">2. Upload your Design (JPG/PNG/PDF)</label>
-                <input type="file" name="file" class="form-control form-control-lg bg-light border-0" required>
-              </div>
-
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">3. Describe your design choice (Short)</label>
-                <textarea name="description" class="form-control bg-light border-0" rows="3" placeholder="I chose these colors because..."></textarea>
-              </div>
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold shadow-sm">
-                  Submit for Verification <i class="bi bi-send-fill ms-2"></i>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                  Module 2: Adobe Photoshop
                 </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(6)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Photoshop Interface</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(7)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Layers & Masks</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(8)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Selection Tools</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(9)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Photo Retouching</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(10)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>5. Color Correction</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(11)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>6. Text Effects</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(12)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>7. Exporting Projects</span>
+                    </button>
+                  </div>
+                </div>
               </div>
+            </div>
 
-            </form>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-bold bg-light text-danger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                  Final Project & Design Toolkit
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-3 bg-light">
+                  
+                  <div class="mb-4">
+                      <h6 class="fw-bold text-dark mb-2"><i class="bi bi-trophy-fill text-warning me-2"></i>Get Verified</h6>
+                      <p class="small text-muted mb-3">Create a "Welcome Back Party" poster using Canva or Photoshop and upload it.</p>
+                      <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                          <input type="url" name="link" class="form-control form-control-sm" placeholder="Canva/Drive Link (Optional)">
+                        </div>
+                        <div class="mb-2">
+                          <input type="file" name="file" class="form-control form-control-sm" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100 fw-bold shadow-sm">Submit Design</button>
+                      </form>
+                  </div>
+
+                  <hr class="text-secondary opacity-25">
+
+                  <div class="mt-4">
+                    <h6 class="fw-bold mb-3 small text-uppercase text-secondary">Designer's Toolkit</h6>
+                    
+                    <div class="mb-3">
+                        <span class="fw-bold small d-block mb-1 text-dark">🎨 Inspiration & Portfolio</span>
+                        <a href="https://www.behance.net/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">Behance</a>
+                        <a href="https://dribbble.com/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">Dribbble</a>
+                        <a href="https://pinterest.com/" target="_blank" class="badge bg-white text-dark border text-decoration-none">Pinterest</a>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="fw-bold small d-block mb-1 text-dark">🆓 Free Images & Icons</span>
+                        <ul class="list-unstyled small text-muted mb-0 ps-1" style="font-size: 0.8rem;">
+                            <li><i class="bi bi-link-45deg text-danger me-1"></i> Unsplash (Stock Photos)</li>
+                            <li><i class="bi bi-link-45deg text-danger me-1"></i> Flaticon (Icons)</li>
+                            <li><i class="bi bi-link-45deg text-danger me-1"></i> Google Fonts</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <span class="fw-bold small d-block mb-1 text-dark">🌍 Find Design Gigs</span>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="https://99designs.com/" target="_blank" class="badge bg-secondary text-decoration-none">99designs</a>
+                            <a href="https://www.fiverr.com/" target="_blank" class="badge bg-secondary text-decoration-none">Fiverr</a>
+                            <a href="https://www.upwork.com/" target="_blank" class="badge bg-secondary text-decoration-none">Upwork</a>
+                        </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </div>
+
     </div>
   </div>
 </section>
+
+<script>
+  // VIDEO DATA
+  const lessons = [
+    // Module 1: Canva
+    { id: 'YqQx75OPRa0', title: '1. Canva Basics', desc: 'Introduction to Canva interface.' },
+    { id: '_2LLXnUdUIc', title: '2. Design Principles', desc: 'Alignment, Contrast, and Balance.' },
+    { id: 'QrNi9FmdlxY', title: '3. Color Theory', desc: 'Choosing the right palette.' },
+    { id: 'zJSgUx5K6V0', title: '4. Typography', desc: 'Font pairing basics.' },
+    { id: 'Llnmf5BXLBA', title: '5. Layout & Composition', desc: 'Arranging elements effectively.' },
+    { id: 'H3S0dEbR8rU', title: '6. Branding Basics', desc: 'Creating a visual identity.' },
+    
+    // Module 2: Photoshop
+    { id: 'IyR_uYsRdPs', title: '7. Photoshop Interface', desc: 'Getting started with Adobe PS.' },
+    { id: 'unCS9syPJjg', title: '8. Layers & Masks', desc: 'Non-destructive editing.' },
+    { id: 'cwl_WnG9DRg', title: '9. Selection Tools', desc: 'Cutting out objects.' },
+    { id: 'r9Z8xY7IUjo', title: '10. Photo Retouching', desc: 'Cleaning up images.' },
+    { id: 'mYw9Kv693gQ', title: '11. Color Correction', desc: 'Adjusting levels and curves.' },
+    { id: '7EjorOn7jAs', title: '12. Text Effects', desc: 'Creative typography in PS.' },
+    { id: '8U8_WbgO9hg', title: '13. Exporting Projects', desc: 'Saving for Web and Print.' }
+  ];
+
+  let currentLessonIndex = 0;
+  let completedLessons = 0;
+
+  // Init
+  window.onload = function() {
+      playLesson(0);
+  };
+
+  // Play Function (With Localhost Fix)
+  function playLesson(index) {
+    if(index < 0 || index >= lessons.length) return; 
+
+    currentLessonIndex = index;
+    const lesson = lessons[index];
+    const currentOrigin = window.location.origin; 
+
+    // Update Iframe
+    document.getElementById('main-video').src = `https://www.youtube.com/embed/${lesson.id}?enablejsapi=1&origin=${currentOrigin}`;
+    
+    // Update Text
+    document.getElementById('video-title').innerText = lesson.title;
+    document.getElementById('video-desc').innerText = lesson.desc;
+
+    // Update Sidebar Active State
+    const buttons = document.querySelectorAll('.list-group-item');
+    buttons.forEach((btn, idx) => {
+        if(idx === index) {
+            btn.classList.add('bg-danger', 'bg-opacity-10', 'text-danger', 'active-lesson');
+            btn.querySelector('i').classList.remove('text-secondary');
+            btn.querySelector('i').classList.add('bi-play-circle-fill', 'text-danger');
+        } else {
+            btn.classList.remove('bg-danger', 'bg-opacity-10', 'text-danger', 'active-lesson');
+            btn.querySelector('i').classList.add('text-secondary');
+            btn.querySelector('i').classList.remove('bi-play-circle-fill', 'text-danger');
+        }
+    });
+  }
+
+  function nextVideo() {
+      playLesson(currentLessonIndex + 1);
+  }
+
+  function prevVideo() {
+      playLesson(currentLessonIndex - 1);
+  }
+
+  function markAsComplete() {
+    if(completedLessons < lessons.length) {
+      completedLessons++;
+      let percentage = Math.round((completedLessons / lessons.length) * 100);
+      
+      // UPDATE PROGRESS BAR
+      document.getElementById('progress-bar').style.width = percentage + "%";
+      document.getElementById('progress-text').innerText = percentage + "%";
+      
+      // Auto-play next
+      nextVideo();
+    }
+  }
+</script>
+
+<style>
+  .active-lesson { font-weight: bold; border-left: 4px solid #dc3545; }
+</style>
 {% endblock %}

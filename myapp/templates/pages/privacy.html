@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Privacy Policy | ComradeGigs{% endblock %}
+
+{% block content %}
+
+<header class="py-5 bg-dark text-white text-center">
+    <div class="container">
+        <h1 class="fw-bold">Privacy Policy</h1>
+        <p class="lead opacity-75">Your data security is our priority.</p>
+    </div>
+</header>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 bg-white p-5 rounded-4 shadow-sm">
+                
+                <h4 class="fw-bold mb-3">1. Information We Collect</h4>
+                <p class="text-secondary mb-2">We collect the following personal information to provide our services:</p>
+                <ul class="text-secondary mb-4">
+                    <li><strong>Account Data:</strong> Name, Email address, and Password.</li>
+                    <li><strong>Verification Data:</strong> University/College ID images (for Students only).</li>
+                    <li><strong>Financial Data:</strong> M-Pesa phone numbers for processing payments.</li>
+                    <li><strong>Profile Data:</strong> Skills, education history, and portfolio uploads.</li>
+                </ul>
+
+                <h4 class="fw-bold mb-3">2. How We Use Your Data</h4>
+                <ul class="text-secondary mb-4">
+                    <li>To verify that students are legitimate university enrollees.</li>
+                    <li>To process secure M-Pesa payments between Clients, Donors, and Students.</li>
+                    <li>To match students with relevant gigs based on their skills.</li>
+                    <li>To improve platform security and detect fraud.</li>
+                </ul>
+
+                <h4 class="fw-bold mb-3">3. Data Security</h4>
+                <p class="text-secondary mb-4">
+                    We use industry-standard encryption to protect your data. <strong>Your School ID is strictly confidential</strong>; it is visible only to our Admin verification team and is never shared with Clients or third parties.
+                </p>
+
+                <h4 class="fw-bold mb-3">4. Third-Party Sharing</h4>
+                <p class="text-secondary mb-4">
+                    We do not sell your personal data. We only share necessary data with:
+                    <br> - <strong>Safaricom (M-Pesa):</strong> To facilitate transaction processing.
+                    <br> - <strong>Cloud Storage Providers:</strong> To securely store your uploaded documents.
+                </p>
+
+                <h4 class="fw-bold mb-3">5. Your Rights</h4>
+                <p class="text-secondary mb-4">
+                    You have the right to access, correct, or delete your personal data. You can edit your profile directly from your dashboard. To request permanent account deletion, contact support.
+                </p>
+
+                <h4 class="fw-bold mb-3">6. Changes to This Policy</h4>
+                <p class="text-secondary mb-0">
+                    We may update this policy from time to time. Users will be notified of significant changes via email or dashboard notifications.
+                </p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

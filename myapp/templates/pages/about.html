@@ -4,68 +4,153 @@
 {% block title %}About Us | ComradeGigs{% endblock %}
 
 {% block content %}
-     <!-- who we are  -->
-<section class="py-5 bg-light">
+
+<header class="py-5 bg-dark text-white position-relative overflow-hidden mb-5">
+    <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-primary opacity-25 blur-3xl" style="width: 400px; height: 400px;"></div>
+    <div class="position-absolute bottom-0 end-0 translate-middle rounded-circle bg-warning opacity-10 blur-3xl" style="width: 300px; height: 300px;"></div>
+
+    <div class="container position-relative z-1 text-center py-5">
+        <span class="badge bg-warning text-dark fw-bold text-uppercase letter-spacing-2 mb-3 px-3 py-2 rounded-pill">
+            Est. 2025
+        </span>
+        <h1 class="display-3 fw-bolder mb-4">Bridging the Gap Between <br class="d-none d-lg-block"> <span class="text-primary">Campus</span> & <span class="text-success">Career</span></h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 700px;">
+            We are building the largest digital economy for Kenyan students. No more <em>kuinama</em>. Just skills, opportunities, and real growth.
+        </p>
+    </div>
+</header>
+
+<section class="py-5">
   <div class="container">
     
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-8 text-center">
-        <h6 class="text-warning fw-bold text-uppercase letter-spacing-2 mb-3">
-          <i class="bi bi-info-circle-fill me-2"></i>Our Story
-        </h6>
-        <h2 class="display-5 fw-bolder text-primary mb-4">Built by Comrades, For Comrades</h2>
-        <p class="lead fs-5 text-dark mb-4">
-          ComradeGigs isn't just a website; it's a movement. We realized that many students have immense talent but lack the connection to real-world work.
-        </p>
-      </div>
+    <div class="row align-items-center mb-5 pb-5 border-bottom">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="position-relative ps-4">
+                <div class="position-absolute top-0 start-0 h-100 bg-warning rounded" style="width: 4px;"></div>
+                <h6 class="text-primary fw-bold text-uppercase mb-2">The Spark</h6>
+                <h2 class="fw-bold mb-3 display-6">Why We Started</h2>
+                <p class="text-muted mb-3">
+                    It started with a simple observation: University hostels are full of talented graphic designers, writers, coders, and virtual assistants who are broke simply because they lack a platform to showcase their work.
+                </p>
+                <p class="text-muted">
+                    <strong>ComradeGigs</strong> was born to fix this. We replaced the "tarmacking" mentality with a digital marketplace where meritocracy rules. If you have the skill, we have the gig.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="p-4 bg-light rounded-4 text-center h-100 border border-light shadow-sm">
+                        <h2 class="fw-bold text-primary mb-0">1K+</h2>
+                        <small class="text-uppercase fw-bold text-muted">Comrades Joined</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-4 bg-light rounded-4 text-center h-100 border border-light shadow-sm">
+                        <h2 class="fw-bold text-success mb-0">500+</h2>
+                        <small class="text-uppercase fw-bold text-muted">Gigs Completed</small>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="p-4 bg-primary bg-opacity-10 rounded-4 text-center h-100 border border-primary border-opacity-10">
+                        <h2 class="fw-bold text-dark mb-0">Ksh 2M+</h2>
+                        <small class="text-uppercase fw-bold text-primary">Paid to Students</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4 mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Our Core Pillars</h2>
+            <p class="text-muted">The foundation of the Alliance.</p>
+        </div>
+
         <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 shadow-sm text-center h-100">
-                <i class="bi bi-rocket-takeoff text-primary fs-1 mb-3"></i>
-                <h5 class="fw-bold">Mission</h5>
-                <p class="text-secondary small">To eradicate student poverty by monetizing skills.</p>
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-primary hover-lift transition">
+                <div class="mb-3 d-inline-block bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                    <i class="bi bi-rocket-takeoff-fill fs-3"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Mission</h4>
+                <p class="text-secondary">To eradicate student financial struggles by democratizing access to work and digital skills.</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 shadow-sm text-center h-100">
-                <i class="bi bi-eye text-warning fs-1 mb-3"></i>
-                <h5 class="fw-bold">Vision</h5>
-                <p class="text-secondary small">A world where every graduate leaves with a portfolio, not just a degree.</p>
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-warning hover-lift transition">
+                <div class="mb-3 d-inline-block bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                    <i class="bi bi-eye-fill fs-3"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Vision</h4>
+                <p class="text-secondary">A future where every graduate leaves campus with a professional portfolio, financial literacy, and a career head-start.</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 shadow-sm text-center h-100">
-                <i class="bi bi-heart text-danger fs-1 mb-3"></i>
-                <h5 class="fw-bold">Values</h5>
-                <p class="text-secondary small">Integrity, Hustle, and Community Support.</p>
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-danger hover-lift transition">
+                <div class="mb-3 d-inline-block bg-danger bg-opacity-10 p-3 rounded-circle text-danger">
+                    <i class="bi bi-heart-fill fs-3"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Values</h4>
+                <ul class="list-unstyled text-secondary mb-0">
+                    <li class="mb-2"><i class="bi bi-check2 text-danger me-2"></i><strong>Hustle:</strong> We respect the grind.</li>
+                    <li class="mb-2"><i class="bi bi-check2 text-danger me-2"></i><strong>Trust:</strong> Secure payments, verified users.</li>
+                    <li><i class="bi bi-check2 text-danger me-2"></i><strong>Community:</strong> We rise by lifting others.</li>
+                </ul>
             </div>
         </div>
     </div>
-          <!-- past achievements -->
-    <div class="row g-4 mb-5">
-        <div class="col-12 text-center mb-2">
-            <h3 class="fw-bold">See the Platform in Action</h3>
+
+    <div class="row g-4 mb-5 align-items-center">
+        <div class="col-lg-5">
+            <h6 class="text-warning fw-bold text-uppercase mb-2">In Action</h6>
+            <h2 class="fw-bold mb-4">See the Impact</h2>
+            <p class="text-muted mb-4">From coding hackathons at the student center to charity drives in our local communities, the ComradeGigs family is always active.</p>
+            
+            <a href="{% url 'myapp:register_landing' %}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">
+                Join the Community <i class="bi bi-arrow-right ms-2"></i>
+            </a>
         </div>
         
-        <div class="col-md-4">
-            <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
-                <img src="{%static 'images/comcoding.jpg' %}" class="img-fluid object-fit-cover h-100" alt="Students Working">
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
-                <img src="{% static 'images/charity.jpg' %}" class="img-fluid object-fit-cover h-100" alt="Charity Visit">
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
-                <img src="{% static 'images/teamsucces.jpg' %}" class="img-fluid object-fit-cover h-100" alt="Success">
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div class="col-8">
+                    <img src="{% static 'images/comcoding.jpg' %}" class="img-fluid rounded-4 shadow-sm object-fit-cover w-100" style="height: 300px;" alt="Students Coding">
+                </div>
+                <div class="col-4">
+                    <img src="{% static 'images/charity.jpg' %}" class="img-fluid rounded-4 shadow-sm object-fit-cover w-100" style="height: 300px;" alt="Charity Event">
+                </div>
+                <div class="col-12">
+                    <img src="{% static 'images/teamsucces.jpg' %}" class="img-fluid rounded-4 shadow-sm object-fit-cover w-100" style="height: 200px; object-position: top;" alt="Team Success">
+                </div>
             </div>
         </div>
     </div>
 
   </div>
 </section>
+
+<section class="py-5 bg-primary bg-gradient text-white text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3">Be Part of the Story</h2>
+                <p class="lead opacity-75 mb-4">Whether you need work done or you need to work, there is a place for you here.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'myapp:register_student' %}" class="btn btn-light text-primary fw-bold rounded-pill px-4 shadow-sm">Join as Student</a>
+                        <a href="{% url 'myapp:register_client' %}" class="btn btn-outline-light fw-bold rounded-pill px-4">Hire Talent</a>
+                    {% else %}
+                        <a href="{% url 'myapp:home' %}" class="btn btn-light text-primary fw-bold rounded-pill px-4 shadow-sm">Go Home</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .blur-3xl { filter: blur(60px); }
+    .transition { transition: all 0.3s ease; }
+</style>
+
 {% endblock %}

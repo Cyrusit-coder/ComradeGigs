@@ -1,0 +1,24 @@
+# --- Python & Django Internals --- 
+__pycache__/ 
+*.py[cod] 
+*$py.class 
+db.sqlite3 
+*.log 
+# --- Static & Media --- 
+# We ignore these because in production (Render),  
+# static is generated and media is stored on Cloudinary. 
+media/ 
+staticfiles/ 
+# --- Virtual Environments --- 
+venv/ 
+env/ 
+.venv/ 
+myenv/
+# --- Environment Variables (CRITICAL FOR SAFETY) --- 
+# Never commit your API keys or Database passwords 
+.env 
+# --- VS Code & IDE settings --- 
+.vscode/ 
+.idea/ 
+*.swp 
+.DS_Store

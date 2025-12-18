@@ -4,105 +4,319 @@
 {% block title %}Virtual Assistant Course | ComradeGigs{% endblock %}
 
 {% block content %}
-       <!-- va learning course nd test -->
-<section class="py-5 bg-light">
+<section class="py-4 bg-light" style="min-height: 100vh;">
   <div class="container">
-    
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-8 text-center">
-        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 mb-3 fw-bold">
-          Skill Module: Virtual Assistant
-        </span>
-        <h2 class="fw-bolder text-dark mb-3">Admin & Organization Assessment</h2>
-        <p class="text-secondary lead fs-6">
-          Prove your organizational skills. Learn how to handle professional emails, data entry, and research for busy clients.
-        </p>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 bg-success text-white overflow-hidden position-relative">
+          <div class="position-absolute top-0 end-0 bg-white opacity-10 rounded-circle" style="width: 200px; height: 200px; margin-right: -50px; margin-top: -50px;"></div>
+          
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <div>
+                <h2 class="fw-bold mb-1">Virtual Assistant Mastery</h2>
+                <p class="mb-0 opacity-75">Welcome, {{ user.username }}! Master the skills to work remotely.</p>
+              </div>
+              <div class="text-end">
+                <h3 class="fw-bold mb-0" id="progress-text">0%</h3>
+                <span class="small opacity-75">Completed</span>
+              </div>
+            </div>
+            <div class="progress bg-white bg-opacity-25 rounded-pill" style="height: 10px;">
+              <div class="progress-bar bg-white rounded-pill" role="progressbar" style="width: 0%;" id="progress-bar"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        
-        <div class="card border-0 shadow-sm rounded-4 mb-5">
-          <div class="card-body p-5">
-            <h4 class="fw-bold text-success mb-4"><i class="bi bi-check2-square me-2"></i>Quick Study Guide</h4>
+    <div class="row g-4">
+      
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 sticky-top" style="top: 20px; z-index: 1;">
+          <div class="ratio ratio-16x9 bg-dark">
+            <iframe id="main-video" 
+                    src="" 
+                    title="Course Video" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+            </iframe>
+          </div>
+          <div class="card-body p-4">
             
-            <div class="row g-4">
-              <div class="col-md-6">
-                <h6 class="fw-bold">1. Email Etiquette</h6>
-                <p class="small text-secondary mb-3">
-                  Always start with a professional greeting ("Dear [Name]"). Be concise. Use bullet points for tasks. End with a clear call to action and a "Best Regards".
-                </p>
-                
-                <h6 class="fw-bold">2. Google Suite Mastery</h6>
-                <p class="small text-secondary">
-                  <strong>Docs:</strong> For notes/writing. <strong>Sheets:</strong> For data entry. <strong>Calendar:</strong> For scheduling. Always check sharing permissions (Viewer vs Editor) before sending links.
-                </p>
-              </div>
-              
-              <div class="col-md-6 border-start-md">
-                <h6 class="fw-bold">3. Calendar Management</h6>
-                <p class="small text-secondary mb-3">
-                  When scheduling, always confirm the <strong>TimeZone</strong> (e.g., EST, GMT, EAT). Send actual calendar invites, not just text confirmations.
-                </p>
-
-                <h6 class="fw-bold">4. Internet Research</h6>
-                <p class="small text-secondary">
-                  Clients pay for summarized info, not raw links. If asked to find "Top 5 Laptops", provide a clean spreadsheet comparing Price, Specs, and Reviews.
-                </p>
-              </div>
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1" id="video-title">Loading Lesson...</h4>
+                <p class="text-muted small mb-0" id="video-desc">Please wait.</p>
             </div>
+
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="prevVideo()">
+                    <i class="bi bi-chevron-left me-1"></i> Previous
+                </button>
+
+                <button class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm" onclick="markAsComplete()">
+                    <i class="bi bi-check-circle-fill me-2"></i>Mark Complete
+                </button>
+
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="nextVideo()">
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                </button>
+            </div>
+
           </div>
         </div>
+      </div>
 
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="card-header bg-success bg-gradient text-white p-4">
-            <h4 class="fw-bold mb-0"><i class="bi bi-envelope-paper-fill me-2"></i>The Practical Test</h4>
+      <div class="col-lg-4">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="fw-bold mb-0">Course Curriculum</h6>
           </div>
-          <div class="card-body p-5">
+          
+          <div class="accordion accordion-flush" id="courseAccordion">
             
-            <div class="alert alert-success border-0 d-flex align-items-center mb-4">
-              <i class="bi bi-calendar-check fs-4 me-3"></i>
-              <div>
-                <strong>Task 1:</strong> Write a professional email response to a client who is angry about a delayed project.
-                <br><em>Be polite, apologize, give a reason, and propose a solution.</em>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  Module 1: Email Etiquette
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(0)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-success"></i> <span>1. 8 Email Etiquette Tips</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(1)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Writing Professional Emails</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(2)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Do's & Don'ts Guide</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(3)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. 10 Actionable Tips</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(4)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>5. Indeed Career Guide</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <form method="post">
-              {% csrf_token %}
-              
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">1. Write your email draft here:</label>
-                <textarea name="email_draft" class="form-control bg-light border-0" rows="6" placeholder="Subject: Regarding the delay...&#10;&#10;Dear Client..." required></textarea>
-              </div>
-
-              <hr class="my-4">
-
-              <div class="alert alert-success border-0 d-flex align-items-center mb-4">
-                <i class="bi bi-table fs-4 me-3"></i>
-                <div>
-                  <strong>Task 2 (Optional):</strong> Create a simple Google Sheet listing 5 Hotels in Nairobi with their prices per night.
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                  Module 2: Google Sheets Mastery
+                </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(5)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Sheets for Beginners</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(6)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Full Course Walkthrough</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(7)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Advanced Tutorial</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(8)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. 10 Incredible Tips</span>
+                    </button>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">2. Paste Link to Google Sheet (Optional)</label>
-                <input type="url" name="link" class="form-control bg-light border-0" placeholder="https://docs.google.com/spreadsheets/...">
-              </div>
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm">
-                  Submit Assessment <i class="bi bi-send-fill ms-2"></i>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                  Module 3: Calendar Management
                 </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(9)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Google Calendar Full Tutorial</span>
+                    </button>
+                  </div>
+                </div>
               </div>
+            </div>
 
-            </form>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                  Module 4: Internet Research
+                </button>
+              </h2>
+              <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(10)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Advanced Search Operators</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed fw-bold bg-light text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                  Final Assessment & Toolkit
+                </button>
+              </h2>
+              <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-3 bg-light">
+                  
+                  <div class="mb-4">
+                      <h6 class="fw-bold text-dark mb-2"><i class="bi bi-trophy-fill text-warning me-2"></i>Get Verified</h6>
+                      <p class="small text-muted mb-3">
+                        Task: Draft an email response to an angry client and provide a research link.
+                      </p>
+                      
+                      <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                          <label class="small fw-bold">1. Email Draft</label>
+                          <textarea name="email_draft" class="form-control form-control-sm" rows="3" placeholder="Subject: Apology for delay..." required></textarea>
+                        </div>
+                        <div class="mb-2">
+                          <label class="small fw-bold">2. Research Link (Google Sheet)</label>
+                          <input type="url" name="link" class="form-control form-control-sm" placeholder="https://docs.google.com/..." required>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-sm w-100 fw-bold shadow-sm mt-2">Submit Assessment</button>
+                      </form>
+                  </div>
+
+                  <hr class="text-secondary opacity-25">
+
+                  <div class="mt-4">
+                    <h6 class="fw-bold mb-3 small text-uppercase text-secondary">VA Toolkit</h6>
+                    
+                    <div class="mb-3">
+                        <span class="fw-bold small d-block mb-1 text-dark">🛠 Essential Tools</span>
+                        <a href="https://trello.com/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">Trello (Tasks)</a>
+                        <a href="https://www.grammarly.com/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">Grammarly</a>
+                        <a href="https://www.worldtimebuddy.com/" target="_blank" class="badge bg-white text-dark border text-decoration-none">Time Zone Conv.</a>
+                    </div>
+
+                    <div>
+                        <span class="fw-bold small d-block mb-1 text-dark">🌍 Find VA Gigs</span>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="https://www.upwork.com/" target="_blank" class="badge bg-secondary text-decoration-none">Upwork</a>
+                            <a href="https://www.vanetworking.com/" target="_blank" class="badge bg-secondary text-decoration-none">VA Networking</a>
+                        </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </div>
+
     </div>
   </div>
 </section>
+
+<script>
+  // VIDEO DATA
+  const lessons = [
+    // Module 1: Email Etiquette
+    { id: '1XctnF7C74s', title: '1. 8 Email Etiquette Tips', desc: 'Professional workplace email advice from HBR.' },
+    { id: 'zMAzNvfefEg', title: '2. Tips for Writing Professional Emails', desc: 'Basic rules of tone, grammar & format.' },
+    { id: 'oI3rVQFye9w', title: '3. Better Emails at Work', desc: 'Tips, do’s & don’ts, structure guide.' },
+    { id: '3iy0K27gvJs', title: '4. 10 Actionable Email Tips', desc: 'Subject lines, greetings & sign-offs.' },
+    { id: '3eLzpJcst5Y', title: '5. Career-Oriented Email Basics', desc: 'What you need to know about email etiquette (Indeed).' },
+    
+    // Module 2: Google Suite (Sheets)
+    { id: 'TENAbUa-R-w', title: '6. Sheets Tutorial for Beginners', desc: 'Intro to Sheets for data entry & organization.' },
+    { id: 'UvCANQhqsSw', title: '7. Sheets for Beginners (Full Course)', desc: 'A complete beginner’s walkthrough.' },
+    { id: 'J7lpjzt6NfQ', title: '8. Advanced Sheets Tutorial', desc: 'Intermediate functions and formatting.' },
+    { id: 'POZorIoSK5c', title: '9. 10 Incredible Sheets Tips', desc: 'Handy tips and practical shortcuts.' },
+
+    // Module 3: Calendar
+    { id: 'kqTL7Gr5oFg', title: '10. Google Calendar Full Tutorial', desc: 'Scheduling, events, multiple calendars.' },
+
+    // Module 4: Research
+    { id: 'BRiNw490Eq0', title: '11. Advanced Search Operators', desc: 'Learn powerful search tools to find info faster.' }
+  ];
+
+  let currentLessonIndex = 0;
+  let completedLessons = 0;
+
+  // Init
+  window.onload = function() {
+      playLesson(0);
+  };
+
+  // Play Function (With Localhost Fix)
+  function playLesson(index) {
+    if(index < 0 || index >= lessons.length) return; 
+
+    currentLessonIndex = index;
+    const lesson = lessons[index];
+    const currentOrigin = window.location.origin; 
+
+    // Update Iframe
+    document.getElementById('main-video').src = `https://www.youtube.com/embed/${lesson.id}?enablejsapi=1&origin=${currentOrigin}`;
+    
+    // Update Text
+    document.getElementById('video-title').innerText = lesson.title;
+    document.getElementById('video-desc').innerText = lesson.desc;
+
+    // Update Sidebar Active State
+    const buttons = document.querySelectorAll('.list-group-item');
+    buttons.forEach((btn, idx) => {
+        if(idx === index) {
+            btn.classList.add('bg-success', 'bg-opacity-10', 'text-success', 'active-lesson');
+            btn.querySelector('i').classList.remove('text-secondary');
+            btn.querySelector('i').classList.add('bi-play-circle-fill', 'text-success');
+        } else {
+            btn.classList.remove('bg-success', 'bg-opacity-10', 'text-success', 'active-lesson');
+            btn.querySelector('i').classList.add('text-secondary');
+            btn.querySelector('i').classList.remove('bi-play-circle-fill', 'text-success');
+        }
+    });
+  }
+
+  function nextVideo() {
+      playLesson(currentLessonIndex + 1);
+  }
+
+  function prevVideo() {
+      playLesson(currentLessonIndex - 1);
+  }
+
+  function markAsComplete() {
+    if(completedLessons < lessons.length) {
+      completedLessons++;
+      let percentage = Math.round((completedLessons / lessons.length) * 100);
+      
+      // UPDATE PROGRESS BAR
+      document.getElementById('progress-bar').style.width = percentage + "%";
+      document.getElementById('progress-text').innerText = percentage + "%";
+      
+      // Auto-play next
+      nextVideo();
+    }
+  }
+</script>
+
+<style>
+  .active-lesson { font-weight: bold; border-left: 4px solid #198754; }
+</style>
 {% endblock %}

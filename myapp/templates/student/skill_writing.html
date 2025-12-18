@@ -4,92 +4,334 @@
 {% block title %}Content Writing Course | ComradeGigs{% endblock %}
 
 {% block content %}
-   <!-- content writing skill course and test -->
-<section class="py-5 bg-light">
+<section class="py-4 bg-light" style="min-height: 100vh;">
   <div class="container">
-    
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-8 text-center">
-        <span class="badge bg-warning bg-opacity-25 text-dark border border-warning rounded-pill px-3 py-2 mb-3 fw-bold">
-          Skill Module: Content Writing
-        </span>
-        <h2 class="fw-bolder text-dark mb-3">Writing & SEO Assessment</h2>
-        <p class="text-secondary lead fs-6">
-          Show us you can write engaging, error-free content. Clients need blogs, articles, and academic summaries.
-        </p>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 bg-warning text-dark overflow-hidden position-relative">
+          <div class="position-absolute top-0 end-0 bg-white opacity-25 rounded-circle" style="width: 200px; height: 200px; margin-right: -50px; margin-top: -50px;"></div>
+          
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <div>
+                <h2 class="fw-bold mb-1">Content Writing Masterclass</h2>
+                <p class="mb-0 opacity-75 fw-bold">Pen mightier than the sword? Let's prove it, {{ user.username }}!</p>
+              </div>
+              <div class="text-end">
+                <h3 class="fw-bold mb-0" id="progress-text">0%</h3>
+                <span class="small opacity-75 fw-bold">Completed</span>
+              </div>
+            </div>
+            <div class="progress bg-white bg-opacity-50 rounded-pill" style="height: 10px;">
+              <div class="progress-bar bg-dark rounded-pill" role="progressbar" style="width: 0%;" id="progress-bar"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        
-        <div class="card border-0 shadow-sm rounded-4 mb-5">
-          <div class="card-body p-5">
-            <h4 class="fw-bold text-dark mb-4"><i class="bi bi-pen me-2"></i>Quick Study Guide</h4>
+    <div class="row g-4">
+      
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 sticky-top" style="top: 20px; z-index: 1;">
+          <div class="ratio ratio-16x9 bg-dark">
+            <iframe id="main-video" 
+                    src="" 
+                    title="Course Video" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+            </iframe>
+          </div>
+          <div class="card-body p-4">
             
-            <div class="row g-4">
-              <div class="col-md-6">
-                <h6 class="fw-bold">1. The "Hook"</h6>
-                <p class="small text-secondary mb-3">
-                  The first sentence is crucial. Grab attention with a question ("Are you tired of being broke?"), a shocking statistic, or a relatable story. Don't be boring!
-                </p>
-                
-                <h6 class="fw-bold">2. Structure (H1, H2, H3)</h6>
-                <p class="small text-secondary">
-                  Break up your text. No one reads huge walls of text on a screen. Use Subheadings (H2, H3) and keep paragraphs short (3-4 sentences max).
-                </p>
-              </div>
-              
-              <div class="col-md-6 border-start-md">
-                <h6 class="fw-bold">3. SEO Basics</h6>
-                <p class="small text-secondary mb-3">
-                  If your keyword is "Best Laptops", include it naturally in the **Title**, the **First Paragraph**, and at least one **Subheading**. Don't spam it.
-                </p>
-
-                <h6 class="fw-bold">4. Originality (Plagiarism)</h6>
-                <p class="small text-secondary">
-                  Never copy-paste from Wikipedia or AI without editing. Tools like Copyscape and Turnitin detect plagiarism instantly. Write in your own voice.
-                </p>
-              </div>
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1" id="video-title">Loading Lesson...</h4>
+                <p class="text-muted small mb-0" id="video-desc">Please wait.</p>
             </div>
+
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="prevVideo()">
+                    <i class="bi bi-chevron-left me-1"></i> Previous
+                </button>
+
+                <button class="btn btn-warning btn-sm rounded-pill px-4 fw-bold shadow-sm text-dark" onclick="markAsComplete()">
+                    <i class="bi bi-check-circle-fill me-2"></i>Mark Complete
+                </button>
+
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="nextVideo()">
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                </button>
+            </div>
+
           </div>
         </div>
+      </div>
 
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="card-header bg-warning bg-gradient text-dark p-4">
-            <h4 class="fw-bold mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>The Practical Test</h4>
+      <div class="col-lg-4">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="fw-bold mb-0">Course Curriculum</h6>
           </div>
-          <div class="card-body p-5">
+          
+          <div class="accordion accordion-flush" id="courseAccordion">
             
-            <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
-              <i class="bi bi-lightbulb-fill fs-4 me-3"></i>
-              <div>
-                <strong>Task:</strong> Write a short, engaging introduction (100-150 words) for a blog post titled:
-                <br><em>"5 Ways University Students Can Save Money on Food."</em>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  Module 1: The Art of the Hook
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(0)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-warning"></i> <span>1. Content Writing 101</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(1)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Writing Content That Ranks</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(2)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Beginner to Advanced Guide</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(3)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. What is SEO Writing?</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <form method="post">
-              {% csrf_token %}
-              
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">Write your blog intro below:</label>
-                <textarea name="article_text" class="form-control bg-light border-0 p-3" rows="8" placeholder="Start with a hook... e.g., 'Have you ever survived on bread and air for a week?'" required></textarea>
-                <div class="form-text text-end">Word count target: ~150 words</div>
-              </div>
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-warning btn-lg rounded-pill fw-bold shadow-sm text-dark">
-                  Submit Writing Assessment <i class="bi bi-send-fill ms-2"></i>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                  Module 2: Structure & Headings
                 </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(4)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Foundational Structure</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(5)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Creating Content Outlines</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(6)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Deep Dive: Structure</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(7)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Readability Guide</span>
+                    </button>
+                  </div>
+                </div>
               </div>
+            </div>
 
-            </form>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                  Module 3: SEO for Writers
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(8)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Keywords & SEO Basics</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(9)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Ahrefs Copywriting Guide</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(10)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Rank #1 on Google</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(11)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Advanced SEO Writing</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                  Module 4: Originality & Quality
+                </button>
+              </h2>
+              <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(12)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Writing Original Content</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(13)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Quality & Uniqueness</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(14)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Editing & Refining</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(15)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Avoiding Plagiarism</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed fw-bold bg-light text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                  Final Assessment & Toolkit
+                </button>
+              </h2>
+              <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-3 bg-light">
+                  
+                  <div class="mb-4">
+                      <h6 class="fw-bold text-dark mb-2"><i class="bi bi-trophy-fill text-warning me-2"></i>Get Verified</h6>
+                      <p class="small text-muted mb-3">
+                        Task: Write an engaging introduction (100-150 words) for a blog titled: <em>"5 Ways Students Can Save Money on Food"</em>.
+                      </p>
+                      
+                      <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                          <textarea name="article_text" class="form-control form-control-sm" rows="6" placeholder="Start with a hook..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold shadow-sm mt-2 text-dark">Submit Writing</button>
+                      </form>
+                  </div>
+
+                  <hr class="text-secondary opacity-25">
+
+                  <div class="mt-4">
+                    <h6 class="fw-bold mb-3 small text-uppercase text-secondary">Writer's Toolkit</h6>
+                    
+                    <div class="mb-3">
+                        <span class="fw-bold small d-block mb-1 text-dark">🛠 Essential Tools</span>
+                        <a href="https://www.grammarly.com/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">Grammarly</a>
+                        <a href="https://hemingwayapp.com/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">Hemingway Editor</a>
+                        <a href="https://problogger.com/" target="_blank" class="badge bg-white text-dark border text-decoration-none">ProBlogger</a>
+                    </div>
+
+                    <div>
+                        <span class="fw-bold small d-block mb-1 text-dark">🌍 Find Writing Gigs</span>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="https://www.upwork.com/" target="_blank" class="badge bg-secondary text-decoration-none">Upwork</a>
+                            <a href="https://www.freelancer.com/" target="_blank" class="badge bg-secondary text-decoration-none">Freelancer</a>
+                            <a href="https://problogger.com/jobs/" target="_blank" class="badge bg-secondary text-decoration-none">ProBlogger Jobs</a>
+                        </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </div>
+
     </div>
   </div>
 </section>
+
+<script>
+  // VIDEO DATA
+  const lessons = [
+    // Module 1: The Hook
+    { id: '8t2FWD45wNA', title: '1. Content Writing 101', desc: 'Basics of structure and hooks (Simplilearn).' },
+    { id: '8BdZ0dUu7VQ', title: '2. Writing Content That Ranks', desc: 'Includes tips for intros and keywords.' },
+    { id: 'IIWQ_k7Ipv4', title: '3. Beginner to Advanced Guide', desc: 'Covers structure and engaging writing.' },
+    { id: 'AR5rNSCDsXE', title: '4. What is SEO Writing?', desc: 'How introductions tie into SEO.' },
+    
+    // Module 2: Structure
+    { id: '8t2FWD45wNA', title: '5. Foundational Structure', desc: 'Revisiting the core building blocks of articles.' },
+    { id: 'uujO8uqjOqw', title: '6. Creating Content Outlines', desc: 'Full course segment on outlining.' },
+    { id: 'IIWQ_k7Ipv4', title: '7. Deep Dive: Structure', desc: 'Advanced look at headings and flow.' },
+    { id: 'qBqMFMTky2o', title: '8. Readability Guide', desc: 'Focus on structure and readability.' },
+
+    // Module 3: SEO
+    { id: '8BdZ0dUu7VQ', title: '9. Keywords & SEO Basics', desc: 'Focuses on ranking factors and keys.' },
+    { id: 'q0Ujy3EN0lk', title: '10. Ahrefs Copywriting Guide', desc: 'From start to finish SEO principles.' },
+    { id: 'IkmPjeNKkBQ', title: '11. Rank #1 on Google', desc: 'SEO fundamentals applied to writing.' },
+    { id: 'uujO8uqjOqw', title: '12. Advanced SEO Writing', desc: 'Structured approach to SEO content.' },
+
+    // Module 4: Originality
+    { id: '8t2FWD45wNA', title: '13. Writing Original Content', desc: 'How to write without copying.' },
+    { id: 'IIWQ_k7Ipv4', title: '14. Quality & Uniqueness', desc: 'Tips for standing out.' },
+    { id: 'q0Ujy3EN0lk', title: '15. Editing & Refining', desc: 'Polishing your work for clients.' },
+    { id: 'qBqMFMTky2o', title: '16. Avoiding Plagiarism', desc: 'Readability and originality best practices.' }
+  ];
+
+  let currentLessonIndex = 0;
+  let completedLessons = 0;
+
+  // Init
+  window.onload = function() {
+      playLesson(0);
+  };
+
+  // Play Function (With Localhost Fix)
+  function playLesson(index) {
+    if(index < 0 || index >= lessons.length) return; 
+
+    currentLessonIndex = index;
+    const lesson = lessons[index];
+    const currentOrigin = window.location.origin; 
+
+    // Update Iframe
+    document.getElementById('main-video').src = `https://www.youtube.com/embed/${lesson.id}?enablejsapi=1&origin=${currentOrigin}`;
+    
+    // Update Text
+    document.getElementById('video-title').innerText = lesson.title;
+    document.getElementById('video-desc').innerText = lesson.desc;
+
+    // Update Sidebar Active State
+    const buttons = document.querySelectorAll('.list-group-item');
+    buttons.forEach((btn, idx) => {
+        if(idx === index) {
+            btn.classList.add('bg-warning', 'bg-opacity-25', 'text-dark', 'active-lesson');
+            btn.querySelector('i').classList.remove('text-secondary');
+            btn.querySelector('i').classList.add('bi-play-circle-fill', 'text-warning');
+        } else {
+            btn.classList.remove('bg-warning', 'bg-opacity-25', 'text-dark', 'active-lesson');
+            btn.querySelector('i').classList.add('text-secondary');
+            btn.querySelector('i').classList.remove('bi-play-circle-fill', 'text-warning');
+        }
+    });
+  }
+
+  function nextVideo() {
+      playLesson(currentLessonIndex + 1);
+  }
+
+  function prevVideo() {
+      playLesson(currentLessonIndex - 1);
+  }
+
+  function markAsComplete() {
+    if(completedLessons < lessons.length) {
+      completedLessons++;
+      let percentage = Math.round((completedLessons / lessons.length) * 100);
+      
+      document.getElementById('progress-bar').style.width = percentage + "%";
+      document.getElementById('progress-text').innerText = percentage + "%";
+      
+      // Auto-play next
+      nextVideo();
+    }
+  }
+</script>
+
+<style>
+  .active-lesson { font-weight: bold; border-left: 4px solid #ffc107; }
+</style>
 {% endblock %}

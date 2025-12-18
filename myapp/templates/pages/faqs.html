@@ -1,86 +1,144 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}FAQs | ComradeGigs{% endblock %}
 
 {% block content %}
-               <!-- frequently asked questions -->
-<section class="py-5 bg-light">
-  <div class="container">
-    
-    <div class="text-center mb-5">
-      <h6 class="text-warning fw-bold text-uppercase letter-spacing-2">Help Center</h6>
-      <h2 class="display-6 fw-bold text-dark">Frequently Asked Questions</h2>
-      <p class="text-secondary">Everything you need to know about fees, trust, and earning.</p>
-    </div>
 
+<header class="py-5 bg-dark text-white text-center position-relative overflow-hidden mb-5">
+    <div class="position-absolute top-0 end-0 w-100 h-100 bg-warning opacity-10"></div>
+    <div class="container position-relative z-1">
+        <h1 class="fw-bold display-5 mb-3">Help Center</h1>
+        <p class="lead opacity-75 mx-auto" style="max-width: 600px;">
+            Answers to common questions about accounts, payments, and safety.
+        </p>
+    </div>
+</header>
+
+<section class="pb-5">
+  <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden" id="faqAccordion">
-
+        
+        <h5 class="fw-bold text-primary mb-3 ps-2 border-start border-4 border-primary">General & Safety</h5>
+        <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden mb-5" id="faqGeneral">
+          
           <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a1">
-                <i class="bi bi-person-plus-fill me-3 text-primary"></i> Is it free to join?
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                <i class="bi bi-person-check-fill me-2 text-success"></i> Is it free to join?
               </button>
             </h2>
-            <div id="a1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faqGeneral">
               <div class="accordion-body text-secondary">
-                <strong>Yes!</strong> Joining ComradeGigs is 100% free for Students, Clients, and Donors. You only pay (or get charged) when a real transaction happens.
+                <strong>Yes!</strong> Signing up is 100% free for everyone (Students, Clients, and Donors). We do not charge registration fees.
               </div>
             </div>
           </div>
 
           <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">
-                <i class="bi bi-pie-chart-fill me-3 text-warning"></i> Does the platform take a commission?
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                <i class="bi bi-shield-lock-fill me-2 text-danger"></i> Is my money/data safe?
               </button>
             </h2>
-            <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqGeneral">
               <div class="accordion-body text-secondary">
-                To keep the website running, secure, and free of scammers, we deduct a small <strong>5% service fee</strong> from the student's earnings upon completing a gig. 
+                Absolutely. We use secure M-Pesa integration for all transactions. We verify student identities via School IDs to prevent fraud. 
                 <br><br>
-                <em>Example: If you earn Ksh 1,000, you receive Ksh 950, and Ksh 50 goes to platform maintenance.</em>
-              </div>
-            </div>
-          </div>
-
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a3">
-                <i class="bi bi-cash-stack me-3 text-success"></i> How do I get paid?
-              </button>
-            </h2>
-            <div id="a3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body text-secondary">
-                Payments are processed via <strong>Secure M-Pesa Transfer</strong>. When a client accepts your work, the funds are released directly to the phone number on your profile. No delays.
-              </div>
-            </div>
-          </div>
-
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a4">
-                <i class="bi bi-shield-check me-3 text-danger"></i> Is it safe from scammers?
-              </button>
-            </h2>
-            <div id="a4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body text-secondary">
-                Yes. We verify Client payments before you start working. 
-                <br><strong>Warning:</strong> Never share your personal phone number or accept payment outside the site. If you do, we cannot protect you if they refuse to pay.
+                <span class="text-danger fw-bold">Warning:</span> Never accept payments outside ComradeGigs. We cannot protect you if you transact offline.
               </div>
             </div>
           </div>
 
         </div>
 
-        <div class="text-center mt-5">
-          <p class="text-muted small">Still have questions?</p>
-          <a href="{% url 'myapp:contact' %}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Contact Support</a>
+        <h5 class="fw-bold text-warning mb-3 ps-2 border-start border-4 border-warning">For Students</h5>
+        <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden mb-5" id="faqStudents">
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                <i class="bi bi-person-badge me-2 text-dark"></i> Why must I upload my School ID?
+              </button>
+            </h2>
+            <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqStudents">
+              <div class="accordion-body text-secondary">
+                This platform is exclusive to university students. Uploading your ID proves you are a verified comrade, which builds trust with clients who hire you.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">
+                <i class="bi bi-cash-stack me-2 text-success"></i> How do I get paid?
+              </button>
+            </h2>
+            <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqStudents">
+              <div class="accordion-body text-secondary">
+                Payment is sent directly to your registered M-Pesa number immediately after the client marks the job as complete.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q5">
+                <i class="bi bi-percent me-2 text-primary"></i> Is there a service fee?
+              </button>
+            </h2>
+            <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faqStudents">
+              <div class="accordion-body text-secondary">
+                To maintain the platform, we deduct a small <strong>5% service fee</strong> from your earnings. 
+                <br><em>(e.g., If a gig pays Ksh 1,000, you receive Ksh 950).</em>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <h5 class="fw-bold text-success mb-3 ps-2 border-start border-4 border-success">For Clients</h5>
+        <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden mb-5" id="faqClients">
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q6">
+                <i class="bi bi-briefcase-fill me-2 text-secondary"></i> How do I know the student is qualified?
+              </button>
+            </h2>
+            <div id="q6" class="accordion-collapse collapse" data-bs-parent="#faqClients">
+              <div class="accordion-body text-secondary">
+                Look for the <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-2 py-0" style="font-size: 0.7em;">Verified Talent</span> badge. 
+                These students have passed our skill assessments. You can also review their past work before hiring.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold py-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q7">
+                <i class="bi bi-arrow-repeat me-2 text-warning"></i> What if I'm not satisfied with the work?
+              </button>
+            </h2>
+            <div id="q7" class="accordion-collapse collapse" data-bs-parent="#faqClients">
+              <div class="accordion-body text-secondary">
+                Do not release payment until you are satisfied. You can communicate with the student via the provided contact buttons to request revisions.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="text-center mt-5 p-4 bg-light rounded-4 border">
+          <h5 class="fw-bold mb-2">Still have questions?</h5>
+          <p class="text-muted small mb-3">Our support team is just a click away.</p>
+          <a href="{% url 'myapp:contact' %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Contact Support</a>
         </div>
 
       </div>
     </div>
-
   </div>
 </section>
+
 {% endblock %}

@@ -1,97 +1,343 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Web Basics Course | ComradeGigs{% endblock %}
+{% block title %}Web Dev Bootcamp | ComradeGigs{% endblock %}
 
 {% block content %}
-     <!-- Web Dev basic course and test -->
-<section class="py-5 bg-light">
+<section class="py-4 bg-light" style="min-height: 100vh;">
   <div class="container">
-    
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-8 text-center">
-        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3 fw-bold">
-          Skill Module: Web Basics
-        </span>
-        <h2 class="fw-bolder text-dark mb-3">HTML/CSS Assessment</h2>
-        <p class="text-secondary lead fs-6">
-          Review the core tags below and build a simple structure to earn your badge.
-        </p>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white overflow-hidden position-relative">
+          <div class="position-absolute top-0 end-0 bg-white opacity-10 rounded-circle" style="width: 200px; height: 200px; margin-right: -50px; margin-top: -50px;"></div>
+          
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <div>
+                <h2 class="fw-bold mb-1">Web Development Bootcamp</h2>
+                <p class="mb-0 opacity-75">Keep going, {{ user.username }}! You are doing great.</p>
+              </div>
+              <div class="text-end">
+                <h3 class="fw-bold mb-0" id="progress-text">0%</h3>
+                <span class="small opacity-75">Completed</span>
+              </div>
+            </div>
+            <div class="progress bg-white bg-opacity-25 rounded-pill" style="height: 10px;">
+              <div class="progress-bar bg-white rounded-pill" role="progressbar" style="width: 0%;" id="progress-bar"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        
-        <div class="card border-0 shadow-sm rounded-4 mb-5">
-          <div class="card-body p-5">
-            <h4 class="fw-bold text-primary mb-4"><i class="bi bi-code-square me-2"></i>Quick Study Guide</h4>
+    <div class="row g-4">
+      
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 sticky-top" style="top: 20px; z-index: 1;">
+          <div class="ratio ratio-16x9 bg-dark">
+            <iframe id="main-video" 
+                    src="" 
+                    title="Course Video" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+            </iframe>
+          </div>
+          <div class="card-body p-4">
             
-            <div class="row g-4">
-              <div class="col-md-6">
-                <h6 class="fw-bold">1. HTML Structure</h6>
-                <code class="d-block bg-light p-3 rounded mb-3 text-dark">
-                  &lt;h1&gt;Main Title&lt;/h1&gt;<br>
-                  &lt;p&gt;Paragraph text...&lt;/p&gt;<br>
-                  &lt;a href="#"&gt;Link&lt;/a&gt;
-                </code>
-                
-                <h6 class="fw-bold">2. Bootstrap Classes (We use this!)</h6>
-                <p class="small text-secondary">
-                  Instead of writing raw CSS, use classes like <code>text-center</code>, <code>btn btn-primary</code>, and <code>row/col</code> for layout.
-                </p>
-              </div>
-              
-              <div class="col-md-6 border-start-md">
-                <h6 class="fw-bold">3. Common Tags</h6>
-                <ul class="small text-secondary mb-4">
-                  <li><strong>&lt;img&gt;:</strong> Always needs an 'src' and 'alt'.</li>
-                  <li><strong>&lt;div&gt;:</strong> The box that holds content.</li>
-                </ul>
-              </div>
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1" id="video-title">Loading Lesson...</h4>
+                <p class="text-muted small mb-0" id="video-desc">Please wait.</p>
             </div>
+
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="prevVideo()">
+                    <i class="bi bi-chevron-left me-1"></i> Previous
+                </button>
+
+                <button class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm" onclick="markAsComplete()">
+                    <i class="bi bi-check-circle-fill me-2"></i>Mark Complete
+                </button>
+
+                <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold" onclick="nextVideo()">
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                </button>
+            </div>
+
           </div>
         </div>
+      </div>
 
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="card-header bg-primary bg-gradient text-white p-4">
-            <h4 class="fw-bold mb-0"><i class="bi bi-laptop-fill me-2"></i>The Practical Test</h4>
+      <div class="col-lg-4">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="fw-bold mb-0">Course Curriculum</h6>
           </div>
-          <div class="card-body p-5">
+          
+          <div class="accordion accordion-flush" id="courseAccordion">
             
-            <div class="alert alert-primary border-0 d-flex align-items-center mb-4">
-              <i class="bi bi-code-slash fs-4 me-3"></i>
-              <div>
-                <strong>Task:</strong> Create a simple "About Me" page using HTML.
-                <br>Include: <em>A Heading (h1), a paragraph about yourself, and a button.</em>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  Module 1: HTML Basics
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(0)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Intro to HTML</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(1)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Headings & Paragraphs</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(2)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Links & Attributes</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(3)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Images</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(4)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>5. Videos</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(5)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>6. Lists</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <form method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">1. Paste your GitHub/replit Link</label>
-                <input type="url" name="link" class="form-control form-control-lg bg-light border-0" placeholder="https://github.com/...">
-              </div>
-
-              <div class="mb-4">
-                <label class="fw-bold text-dark mb-2">2. Or Upload index.html file</label>
-                <input type="file" name="file" class="form-control form-control-lg bg-light border-0">
-              </div>
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
-                  Submit Web Assessment <i class="bi bi-send-fill ms-2"></i>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                  Module 2: CSS Styling
                 </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(6)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Intro to CSS</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(7)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Colors & Backgrounds</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(8)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Borders & Margins</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(9)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Width & Height</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(10)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>5. The Box Model</span>
+                    </button>
+                  </div>
+                </div>
               </div>
+            </div>
 
-            </form>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                  Module 3: Responsive Design
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(11)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Intro to Responsive</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(12)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>2. Media Queries</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(13)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>3. Flexbox Layout</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(14)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>4. Grid Layout</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                  Module 4: Git & GitHub
+                </button>
+              </h2>
+              <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-0">
+                  <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" onclick="playLesson(15)">
+                      <i class="bi bi-play-circle me-3 fs-5 text-secondary"></i> <span>1. Git & GitHub</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed fw-bold bg-light text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                  Final Project & Career Resources
+                </button>
+              </h2>
+              <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#courseAccordion">
+                <div class="accordion-body p-3 bg-light">
+                  
+                  <div class="mb-4">
+                      <h6 class="fw-bold text-dark mb-2"><i class="bi bi-trophy-fill text-warning me-2"></i>Get Verified</h6>
+                      <p class="small text-muted mb-3">Build a simple portfolio using what you learned and submit the link here.</p>
+                      <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                          <input type="url" name="link" class="form-control form-control-sm" placeholder="Project Link (GitHub/Vercel)" required>
+                        </div>
+                        <div class="mb-2">
+                          <input type="file" name="file" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm">Submit for Review</button>
+                      </form>
+                  </div>
+
+                  <hr class="text-secondary opacity-25">
+
+                  <div class="mt-4">
+                    <h6 class="fw-bold mb-3 small text-uppercase text-secondary">Career Toolkit</h6>
+                    
+                    <div class="mb-3">
+                        <span class="fw-bold small d-block mb-1 text-dark">📚 Cheat Sheets</span>
+                        <a href="https://www.w3schools.com/html/" target="_blank" class="badge bg-white text-dark border me-1 text-decoration-none">W3Schools</a>
+                        <a href="https://htmlcheatsheet.com/" target="_blank" class="badge bg-white text-dark border text-decoration-none">HTML CheatSheet</a>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="fw-bold small d-block mb-1 text-dark">💼 LinkedIn Tips</span>
+                        <ul class="list-unstyled small text-muted mb-0 ps-1" style="font-size: 0.8rem;">
+                            <li><i class="bi bi-check2 text-success me-1"></i> Add "Web Basics" to Skills.</li>
+                            <li><i class="bi bi-check2 text-success me-1"></i> Post your project link.</li>
+                            <li><i class="bi bi-check2 text-success me-1"></i> Connect with peers.</li>
+                        </ul>
+                        <a href="https://www.linkedin.com/" target="_blank" class="btn btn-outline-primary btn-sm w-100 mt-2 py-0" style="font-size: 0.75rem;">Go to LinkedIn</a>
+                    </div>
+
+                    <div>
+                        <span class="fw-bold small d-block mb-1 text-dark">🌍 Find Gigs (Outside Here)</span>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="https://www.upwork.com/" target="_blank" class="badge bg-secondary text-decoration-none">Upwork</a>
+                            <a href="https://www.fiverr.com/" target="_blank" class="badge bg-secondary text-decoration-none">Fiverr</a>
+                            <a href="https://www.freelancer.com/" target="_blank" class="badge bg-secondary text-decoration-none">Freelancer</a>
+                        </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </div>
+
     </div>
   </div>
 </section>
+
+<script>
+  // 1. DATA: List of all videos
+  const lessons = [
+    { id: 'UB1O30fR-EE', title: '1. Intro to HTML', desc: 'Structure of a webpage.' },
+    { id: 'salY_Sm6mv4', title: '2. Headings & Paragraphs', desc: 'Text formatting basics.' },
+    { id: 'tsEQgGjSmkM', title: '3. Links & Attributes', desc: 'Connecting pages.' },
+    { id: 'mD8eFFz2g8o', title: '4. Images', desc: 'Adding visuals.' },
+    { id: 'fNcJuPIZ2WE', title: '5. Videos', desc: 'Embedding media.' },
+    { id: 'kGW8Al_cga4', title: '6. Semantic Elements', desc: 'Writing clean code.' },
+    
+    { id: 'yfoY53QXEnI', title: '7. Intro to CSS', desc: 'Styling your page.' },
+    { id: 'rIO5326FgPE', title: '8. Colors & Backgrounds', desc: 'Visual design.' },
+    { id: 'JJSoEo8JSnc', title: '9. Borders & Margins', desc: 'Spacing elements.' },
+    { id: '9zBsdzdE4sM', title: '10. Width & Height', desc: 'Sizing elements.' },
+    { id: 'HNgdhp1_kEE', title: '11. The Box Model', desc: 'Core layout concept.' },
+
+    { id: 'srvUrASNj0s', title: '12. Intro to Responsive', desc: 'Mobile-friendly sites.' },
+    { id: 'N5wpD9Ov_To', title: '13. Media Queries', desc: 'CSS Breakpoints.' },
+    { id: 'At4B7A4GOPg', title: '14. Flexbox Layout', desc: 'Modern layout system.' },
+    { id: 'ldwlOzRvYOU', title: '15. Grid Layout', desc: 'Advanced layouts.' },
+
+    { id: 'RGOj5yH7evk', title: '16. Git & GitHub', desc: 'Version control basics.' }
+  ];
+
+  let currentLessonIndex = 0;
+  let completedLessons = 0;
+
+  // 2. INIT: Load first video on page load
+  window.onload = function() {
+      playLesson(0);
+  };
+
+  // 3. PLAY FUNCTION (Fixes Error 153)
+  function playLesson(index) {
+    if(index < 0 || index >= lessons.length) return; 
+
+    currentLessonIndex = index;
+    const lesson = lessons[index];
+    const currentOrigin = window.location.origin; // e.g. http://127.0.0.1:8000
+
+    // Update Iframe
+    document.getElementById('main-video').src = `https://www.youtube.com/embed/${lesson.id}?enablejsapi=1&origin=${currentOrigin}`;
+    
+    // Update Text
+    document.getElementById('video-title').innerText = lesson.title;
+    document.getElementById('video-desc').innerText = lesson.desc;
+
+    // Update Active Styling in Sidebar
+    const buttons = document.querySelectorAll('.list-group-item');
+    buttons.forEach((btn, idx) => {
+        if(idx === index) {
+            btn.classList.add('bg-primary', 'bg-opacity-10', 'text-primary', 'active-lesson');
+            btn.querySelector('i').classList.remove('text-secondary');
+            btn.querySelector('i').classList.add('bi-play-circle-fill', 'text-primary');
+        } else {
+            btn.classList.remove('bg-primary', 'bg-opacity-10', 'text-primary', 'active-lesson');
+            btn.querySelector('i').classList.add('text-secondary');
+            btn.querySelector('i').classList.remove('bi-play-circle-fill', 'text-primary');
+        }
+    });
+  }
+
+  // 4. NAV CONTROLS
+  function nextVideo() {
+      playLesson(currentLessonIndex + 1);
+  }
+
+  function prevVideo() {
+      playLesson(currentLessonIndex - 1);
+  }
+
+  function markAsComplete() {
+    if(completedLessons < lessons.length) {
+      completedLessons++;
+      let percentage = Math.round((completedLessons / lessons.length) * 100);
+      
+      document.getElementById('progress-bar').style.width = percentage + "%";
+      document.getElementById('progress-text').innerText = percentage + "%";
+      
+      // Auto-play next video
+      nextVideo();
+    }
+  }
+</script>
+
+<style>
+  .active-lesson { font-weight: bold; border-left: 4px solid #0d6efd; }
+</style>
 {% endblock %}
