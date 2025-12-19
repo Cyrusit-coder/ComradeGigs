@@ -33,7 +33,8 @@ def about(request):
     return render(request, 'pages/about.html')
 
 def events(request):
-    events = Event.objects.all().order_by('date')
+    # UPDATED: Orders by newest first (-date_time) so the new event shows at the top
+    events = Event.objects.all().order_by('-date_time')
     return render(request, 'pages/events.html', {'events': events})
 
 def contact(request):
@@ -644,8 +645,8 @@ def admin_dashboard(request):
 
     pending_apps_count = Application.objects.filter(is_accepted=False, is_rejected=False).count()
     
-    # Events & Updates
-    events = Event.objects.all().order_by('date')
+    # UPDATED: Changed .order_by('date') to .order_by('date_time') to match the field name
+    events = Event.objects.all().order_by('date_time')
     site_updates = SiteUpdate.objects.filter(is_active=True).order_by('-created_at')
 
     context = {
