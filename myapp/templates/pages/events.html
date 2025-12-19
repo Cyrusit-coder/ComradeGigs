@@ -43,8 +43,8 @@
           </div>
           <div class="card-body p-4 d-flex flex-column">
             <div class="d-flex align-items-center text-muted small mb-3">
-              <i class="bi bi-calendar-event me-2 text-primary"></i> <span class="fw-bold me-3">{{ event.date_time|date:"M d" }}</span>
-              <i class="bi bi-clock me-2 text-primary"></i> <span>{{ event.date_time|time:"H:i A" }}</span>
+              <i class="bi bi-calendar-event me-2 text-primary"></i> <span class="fw-bold me-3">{{ event.date|date:"M d" }}</span>
+              <i class="bi bi-clock me-2 text-primary"></i> <span>{{ event.date|time:"H:i A" }}</span>
             </div>
             <h5 class="fw-bold text-dark mb-2">{{ event.title }}</h5>
             <div class="mb-2 text-secondary small"><i class="bi bi-geo-alt-fill me-1"></i> {{ event.location }}</div>
