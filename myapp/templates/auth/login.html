@@ -4,8 +4,7 @@
 {% block title %}Login | ComradeGigs{% endblock %}
 
 {% block content %}
-     <!-- login page -->
-<div class="container-fluid p-0">
+      <div class="container-fluid p-0">
   <div class="row g-0" style="min-height: 85vh;">
     
     <div class="col-lg-6 d-none d-lg-block position-relative bg-dark">
@@ -29,8 +28,7 @@
 
         <form method="post" class="needs-validation">
           {% csrf_token %}
-              <!-- wrong login credentials -->
-          {% if form.non_field_errors %}
+              {% if form.non_field_errors %}
             <div class="alert alert-danger d-flex align-items-center mb-4 rounded-3 shadow-sm" role="alert">
               <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
               <div>
@@ -45,14 +43,28 @@
           <div class="mb-4">
             <label class="form-label fw-bold small text-uppercase text-secondary">{{ field.label }}</label>
             <div class="input-group">
-              <span class="input-group-text bg-light border-end-0"><i class="bi bi-card-text"></i></span>
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                  {% if field.field.widget.input_type == 'password' %}
+                    <i class="bi bi-lock"></i>
+                  {% else %}
+                    <i class="bi bi-person"></i>
+                  {% endif %}
+              </span>
               
               <input type="{{ field.field.widget.input_type }}" 
                      name="{{ field.name }}" 
-                     class="form-control bg-light border-start-0 py-2" 
+                     id="{{ field.id_for_label }}" 
+                     class="form-control bg-light border-start-0 py-2 {% if field.field.widget.input_type == 'password' %}border-end-0{% endif %}" 
                      placeholder="Enter {{ field.label }}"
                      required>
+
+              {% if field.field.widget.input_type == 'password' %}
+                <span class="input-group-text bg-light border-start-0 text-muted" style="cursor: pointer;" onclick="togglePassword('{{ field.id_for_label }}', this)">
+                    <i class="bi bi-eye"></i>
+                </span>
+              {% endif %}
             </div>
+
             {% if field.errors %}
               <div class="text-danger small mt-1">
                 {% for error in field.errors %}
@@ -81,4 +93,22 @@
 
   </div>
 </div>
+
+<script>
+    function togglePassword(fieldId, iconContainer) {
+        const inputField = document.getElementById(fieldId);
+        const icon = iconContainer.querySelector('i');
+
+        if (inputField.type === "password") {
+            inputField.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            inputField.type = "password";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        }
+    }
+</script>
+
 {% endblock %}

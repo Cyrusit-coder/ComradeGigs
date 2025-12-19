@@ -4,8 +4,7 @@
 {% block title %}Client Sign Up | ComradeGigs{% endblock %}
 
 {% block content %}
-     <!-- reg of client -->
-<div class="container py-5">
+      <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-5 col-md-7">
       
@@ -39,8 +38,17 @@
                 <div class="input-group">
                     {% if field.name == 'email' %}
                         <input type="email" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control bg-light border-0 py-2" required>
+                    
                     {% elif field.name == 'password' or 'password' in field.name %}
-                        <input type="password" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control bg-light border-0 py-2" required>
+                        <input type="password" 
+                               name="{{ field.name }}" 
+                               id="{{ field.id_for_label }}" 
+                               class="form-control bg-light border-0 py-2" 
+                               required>
+                        <span class="input-group-text bg-light border-0 text-secondary" style="cursor: pointer;" onclick="togglePassword('{{ field.id_for_label }}', this)">
+                            <i class="bi bi-eye"></i>
+                        </span>
+
                     {% else %}
                         <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control bg-light border-0 py-2" required>
                     {% endif %}
@@ -76,4 +84,23 @@
     </div>
   </div>
 </div>
+
+<script>
+    function togglePassword(fieldId, iconContainer) {
+        const inputField = document.getElementById(fieldId);
+        const icon = iconContainer.querySelector('i');
+
+        if (inputField.type === "password") {
+            inputField.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            inputField.type = "password";
+            icon.classList.remove("bi-eye"); // Reset to eye
+            icon.classList.add("bi-eye");    // Ensure eye is there
+            // Note: The previous logic had a small typo, fixed here for robustness:
+            icon.className = "bi bi-eye"; 
+        }
+    }
+</script>
 {% endblock %}
