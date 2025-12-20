@@ -157,6 +157,10 @@ def upload_school_id(request):
         form = StudentIDUploadForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
+            # Clear rejection reason upon new upload
+            profile.id_rejection_reason = None
+            profile.save()
+            
             messages.success(request, "School ID uploaded! Waiting for Admin verification.")
             return redirect('myapp:student_dashboard')
     else:
@@ -742,6 +746,28 @@ def admin_verify_user(request, user_id):
             user_to_verify.is_verified = True
             messages.success(request, f"{user_to_verify.username} successfully verified.")
         user_to_verify.save()
+        
+    return redirect('myapp:admin_users')
+
+# --- NEW: Admin Reject ID Logic ---
+@login_required
+def admin_reject_id(request, user_id):
+    if not request.user.is_superuser:
+        return redirect('myapp:home')
+        
+    user_to_reject = get_object_or_404(User, pk=user_id)
+    
+    if user_to_reject.role == 'student':
+        profile = user_to_reject.student_profile
+        
+        # 1. Set Unverified
+        profile.is_id_verified = False
+        
+        # 2. Set the Reason
+        profile.id_rejection_reason = "Image was blurry or invalid. Please upload a clear photo of your School ID."
+        
+        profile.save()
+        messages.warning(request, f"ID Rejected for {user_to_reject.username}. They have been notified.")
         
     return redirect('myapp:admin_users')
 

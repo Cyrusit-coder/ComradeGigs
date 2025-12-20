@@ -94,30 +94,52 @@
               </td>
 
               <td class="text-end pe-4">
-                <div class="d-flex justify-content-end gap-2">
+                <div class="d-flex justify-content-end gap-2 align-items-center">
                   
+                  {% if user.phone_number %}
+                  <a href="https://wa.me/{{ user.phone_number }}" target="_blank" class="btn btn-sm btn-outline-success rounded-circle shadow-sm" title="Chat on WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                  </a>
+                  {% endif %}
+
+                  <a href="mailto:{{ user.email }}" class="btn btn-sm btn-outline-dark rounded-circle shadow-sm" title="Send Email">
+                    <i class="bi bi-envelope"></i>
+                  </a>
+
+                  <div class="vr mx-1"></div>
+
                   {% if user.role != 'admin' %}
-                      <form method="post" action="{% url 'myapp:admin_verify_user' user.id %}">
-                        {% csrf_token %}
-                        
-                        {% if user.role == 'student' %}
-                            {% if user.student_profile.is_id_verified %}
+                      {% if user.role == 'student' %}
+                          {% if user.student_profile.is_id_verified %}
+                              <form method="post" action="{% url 'myapp:admin_verify_user' user.id %}">
+                                {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill" title="Revoke ID Verification">
                                     <i class="bi bi-x-lg"></i> Unverify
                                 </button>
-                            {% else %}
-                                {% if user.student_profile.school_id_image %}
+                              </form>
+                          {% else %}
+                              {% if user.student_profile.school_id_image %}
+                                  <form method="post" action="{% url 'myapp:admin_verify_user' user.id %}" class="d-inline">
+                                    {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" title="Approve Student ID">
-                                        <i class="bi bi-check2-all"></i> Verify ID
+                                        <i class="bi bi-check2-all"></i> Verify
                                     </button>
-                                {% else %}
-                                    <button type="button" class="btn btn-sm btn-light text-muted rounded-pill" disabled title="No ID Uploaded">
-                                        Wait Upload
-                                    </button>
-                                {% endif %}
-                            {% endif %}
-                        
-                        {% else %}
+                                  </form>
+                                  <a href="{% url 'myapp:admin_reject_id' user.id %}" 
+                                     class="btn btn-sm btn-outline-danger rounded-pill" 
+                                     onclick="return confirm('Reject this ID? The student will be notified.');"
+                                     title="Reject ID">
+                                     Reject
+                                  </a>
+                              {% else %}
+                                  <button type="button" class="btn btn-sm btn-light text-muted rounded-pill" disabled title="No ID Uploaded">
+                                      Wait Upload
+                                  </button>
+                              {% endif %}
+                          {% endif %}
+                      {% else %}
+                          <form method="post" action="{% url 'myapp:admin_verify_user' user.id %}">
+                            {% csrf_token %}
                             {% if user.is_verified %}
                                 <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill" title="Revoke Verification">
                                     <i class="bi bi-x-circle"></i> Unverify
@@ -127,18 +149,18 @@
                                     <i class="bi bi-check2-all"></i> Verify
                                 </button>
                             {% endif %}
-                        {% endif %}
-                      </form>
+                          </form>
+                      {% endif %}
                   {% endif %}
 
                   <form method="post" action="{% url 'myapp:admin_ban_user' user.id %}" onsubmit="return confirm('Are you sure you want to change access for this user?');">
                     {% csrf_token %}
                     {% if user.is_active %}
-                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Ban User">
+                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Ban User">
                         <i class="bi bi-slash-circle"></i>
                       </button>
                     {% else %}
-                      <button type="submit" class="btn btn-sm btn-success rounded-pill" title="Unban User">
+                      <button type="submit" class="btn btn-sm btn-success rounded-circle" title="Unban User">
                         <i class="bi bi-arrow-counterclockwise"></i>
                       </button>
                     {% endif %}

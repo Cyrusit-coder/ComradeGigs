@@ -82,12 +82,14 @@ urlpatterns = [
     
     # This URL handles the creation of updates for specific users (Maintenance, etc.)
     path('admin-panel/update/create/', views.create_site_update, name='create_site_update'), 
+    # NEW: Reject ID Logic
+    path('admin-panel/users/reject/<int:user_id>/', views.admin_reject_id, name='admin_reject_id'),
 ]
 
 # --- CRITICAL: Serve Media Files (Images) manually to fix Render 404 ---
 # This forces Django to serve files from MEDIA_ROOT when accessed via MEDIA_URL
-urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {
-        'document_root': settings.MEDIA_ROOT,
-    }),
-]
+# urlpatterns += [
+#     re_path(r'^media/(?P<path>.*)$', serve, {
+#         'document_root': settings.MEDIA_ROOT,
+#     }),
+# ]

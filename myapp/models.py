@@ -28,7 +28,7 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
-# 4. Student Profile (UPDATED WITH ID VERIFICATION)
+# 4. Student Profile (UPDATED WITH REJECTION LOGIC)
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     
@@ -48,9 +48,12 @@ class StudentProfile(models.Model):
     is_skill_verified = models.BooleanField(default=False) 
     skill_assessment_submission = models.FileField(upload_to='assessments/', null=True, blank=True)
 
-    # 2. Identity Verification (School ID) - NEW
+    # 2. Identity Verification (School ID)
     school_id_image = models.ImageField(upload_to='student_ids/', blank=True, null=True)
     is_id_verified = models.BooleanField(default=False)
+    
+    # --- NEW: Rejection Reason Field ---
+    id_rejection_reason = models.TextField(blank=True, null=True, help_text="Reason for rejecting the ID")
 
     def __str__(self):
         return f"{self.user.username} - {self.university}"
@@ -189,13 +192,13 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
-# 11. Site Updates (Admin Announcements) - UPDATED
+# 11. Site Updates (Admin Announcements)
 class SiteUpdate(models.Model):
     AUDIENCE_CHOICES = (
         ('all', 'All Users'),
         ('student', 'Students Only'),
         ('client', 'Clients Only'),
-        ('donor', 'Donors Only'), # Added Donor Option
+        ('donor', 'Donors Only'),
     )
     
     title = models.CharField(max_length=200)
