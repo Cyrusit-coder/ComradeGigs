@@ -20,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-t257&6zk)05-4i!=p(s=6z522ms%az6d)tl5uer06fx-=zwz5y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Automatically set DEBUG to False when running on Render
 DEBUG = 'RENDER' not in os.environ
 
 ALLOWED_HOSTS = [
@@ -33,7 +32,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    # Cloudinary apps (Must be at the top to override default storage behavior)
+    # Cloudinary apps (Must be at the top)
     'cloudinary_storage',
     'cloudinary',
 
@@ -79,8 +78,6 @@ WSGI_APPLICATION = 'comgigs.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -127,14 +124,17 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/' 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# --- MODERN STORAGE CONFIGURATION (Django 4.2+) ---
-# This replaces STATICFILES_STORAGE and DEFAULT_FILE_STORAGE
+# --- STORAGE CONFIGURATION ---
+
+# 1. Legacy Settings (REQUIRED to stop the "AttributeError" crash)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# 2. Modern Settings (Django 4.2+)
 STORAGES = {
-    # Media (User Uploads) -> Goes to Cloudinary
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # Static (CSS/JS) -> Goes to Whitenoise (Compressed & Cached)
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
