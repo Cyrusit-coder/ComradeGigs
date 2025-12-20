@@ -159,6 +159,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'myapp/static'), # Your custom styles
 ]
 
+# Media Files (User Uploads like IDs and Profile Pics)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
 MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE")

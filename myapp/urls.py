@@ -1,9 +1,10 @@
-from django.urls import path
+from django.urls import path, re_path  # Added re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve  # Added serve
 from . import views
 
-app_name = 'myapp'  
+app_name = 'myapp'   
 
 urlpatterns = [
     # --- 1. Public Pages ---
@@ -83,6 +84,10 @@ urlpatterns = [
     path('admin-panel/update/create/', views.create_site_update, name='create_site_update'), 
 ]
 
-# --- CRITICAL: Serve Media Files (Images) during Development ---
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# --- CRITICAL: Serve Media Files (Images) manually to fix Render 404 ---
+# This forces Django to serve files from MEDIA_ROOT when accessed via MEDIA_URL
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]
