@@ -7,6 +7,21 @@
 <section class="py-4">
   <div class="container">
     
+    {% if user.student_profile.id_rejection_reason and not user.student_profile.is_id_verified %}
+    <div class="alert alert-danger shadow-sm rounded-4 mb-4 d-flex align-items-center" role="alert">
+      <i class="bi bi-exclamation-triangle-fill fs-2 me-3"></i>
+      <div>
+        <h5 class="alert-heading fw-bold mb-1">Action Required: ID Rejected</h5>
+        <p class="mb-1">
+          Admin Message: <strong>"{{ user.student_profile.id_rejection_reason }}"</strong>
+        </p>
+        <a href="{% url 'myapp:upload_school_id' %}" class="btn btn-danger btn-sm rounded-pill fw-bold mt-1 shadow-sm">
+          <i class="bi bi-upload me-1"></i> Upload Correct ID
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
       <div>
         <h2 class="fw-bold mb-0">Student Dashboard</h2>
@@ -17,8 +32,12 @@
                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill d-flex align-items-center gap-1 px-3">
                     <i class="bi bi-person-badge-fill"></i> ID Verified
                 </span>
-            {% else %}
+            {% elif user.student_profile.id_rejection_reason %}
                 <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-3">
+                    <i class="bi bi-x-circle-fill"></i> ID Rejected
+                </span>
+            {% else %}
+                <span class="badge bg-warning bg-opacity-10 text-dark border border-warning rounded-pill px-3">
                     <i class="bi bi-person-exclamation"></i> ID Pending
                 </span>
             {% endif %}
@@ -90,11 +109,14 @@
                 <p class="mb-0 text-dark opacity-75 small">
                     {% if user.student_profile.school_id_image %}
                         Your School ID has been uploaded and is <strong>pending admin approval</strong>. You will be notified once verified.
+                    {% elif user.student_profile.id_rejection_reason %}
+                        <span class="text-danger fw-bold">Your previous upload was rejected.</span> Please upload a clearer image.
                     {% else %}
                         To ensure platform safety, you must upload your <strong>University/College ID</strong> before you can browse gigs.
                     {% endif %}
                 </p>
             </div>
+            
             {% if not user.student_profile.school_id_image %}
                 <a href="{% url 'myapp:upload_school_id' %}" class="btn btn-warning text-dark fw-bold rounded-pill ms-auto px-4 shadow-sm">
                     Upload ID Now
@@ -115,7 +137,6 @@
     {% endif %}
 
     {% if user.student_profile.skills.exists %}
-      
       <div class="row g-4 mb-5">
          <div class="col-md-4">
           <div class="card border-0 shadow-sm rounded-4 bg-primary bg-gradient text-white h-100 p-3">
@@ -156,7 +177,6 @@
       </div>
 
       <div class="row g-4">
-        
         <div class="col-lg-8">
             
           {% if active_jobs_list %}

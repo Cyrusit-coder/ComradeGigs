@@ -764,10 +764,14 @@ def admin_reject_id(request, user_id):
         profile.is_id_verified = False
         
         # 2. Set the Reason
-        profile.id_rejection_reason = "Image was blurry or invalid. Please upload a clear photo of your School ID."
+        profile.id_rejection_reason = "Your ID was blurry or invalid. Please upload a clearer photo."
         
+        # 3. CRITICAL FIX: Delete the bad image so the Admin knows it's gone
+        if profile.school_id_image:
+            profile.school_id_image.delete()  # This removes the file
+            
         profile.save()
-        messages.warning(request, f"ID Rejected for {user_to_reject.username}. They have been notified.")
+        messages.warning(request, f"ID Rejected for {user_to_reject.username}. Image removed.")
         
     return redirect('myapp:admin_users')
 

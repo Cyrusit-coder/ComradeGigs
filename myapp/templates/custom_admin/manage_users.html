@@ -69,14 +69,20 @@
               <td class="text-center">
                   {% if user.role == 'student' %}
                       <div class="d-flex flex-column gap-1 align-items-center">
+                          
                           {% if user.student_profile.is_id_verified %}
                              <span class="badge bg-primary rounded-pill"><i class="bi bi-person-badge me-1"></i>ID Verified</span>
+                          
+                          {% elif user.student_profile.id_rejection_reason and not user.student_profile.school_id_image %}
+                             <span class="badge bg-danger rounded-pill">Rejected</span>
+                             <span class="small text-danger fw-bold" style="font-size: 0.65rem;">Waiting Re-upload</span>
+
                           {% else %}
-                             <span class="badge bg-warning text-dark rounded-pill">ID Pending</span>
                              {% if user.student_profile.school_id_image %}
+                                <span class="badge bg-warning text-dark rounded-pill">ID Pending</span>
                                 <a href="{{ user.student_profile.school_id_image.url }}" target="_blank" class="small text-primary text-decoration-underline fw-bold mt-1">View ID Card</a>
                              {% else %}
-                                <span class="small text-muted" style="font-size: 0.7rem;">(No Upload)</span>
+                                <span class="badge bg-secondary rounded-pill">No Upload</span>
                              {% endif %}
                           {% endif %}
 
@@ -125,6 +131,7 @@
                                         <i class="bi bi-check2-all"></i> Verify
                                     </button>
                                   </form>
+                                  
                                   <a href="{% url 'myapp:admin_reject_id' user.id %}" 
                                      class="btn btn-sm btn-outline-danger rounded-pill" 
                                      onclick="return confirm('Reject this ID? The student will be notified.');"
@@ -137,6 +144,7 @@
                                   </button>
                               {% endif %}
                           {% endif %}
+                      
                       {% else %}
                           <form method="post" action="{% url 'myapp:admin_verify_user' user.id %}">
                             {% csrf_token %}
