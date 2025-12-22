@@ -57,6 +57,19 @@
       {% endif %}
     </div>
 
+    {% if whatsapp_url %}
+    <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-whatsapp fs-3 me-3"></i>
+        <div>
+            <h6 class="fw-bold mb-1">Stay Updated!</h6>
+            <p class="mb-0 small">Join the official ComradeGigs Channel for instant job alerts and tips.</p>
+        </div>
+        <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success rounded-pill fw-bold ms-auto px-4">
+            Join Now
+        </a>
+    </div>
+    {% endif %}
+
     {% if site_updates %}
     <div class="row mb-4" id="notifications-container">
         <div class="col-12">
@@ -264,13 +277,13 @@
 
         <div class="col-lg-4">
           {% if user.student_profile.is_skill_verified and user.student_profile.is_id_verified %}
-          <div class="card border-0 shadow-sm rounded-4 bg-dark text-white p-4 sticky-top" style="top: 20px; z-index: 1;">
+          <div class="card border-0 shadow-sm rounded-4 bg-dark text-white p-4 sticky-top mb-4" style="top: 20px; z-index: 1;">
             <h5 class="fw-bold">Ready to work?</h5>
             <p class="small opacity-75">Your profile is fully verified! Start browsing gigs now.</p>
             <a href="{% url 'myapp:job_list' %}" class="btn btn-light rounded-pill fw-bold w-100">Browse Gigs</a>
           </div>
           {% else %}
-          <div class="card border-0 shadow-sm rounded-4 bg-warning bg-opacity-10 p-4 border border-warning sticky-top" style="top: 20px;">
+          <div class="card border-0 shadow-sm rounded-4 bg-warning bg-opacity-10 p-4 border border-warning sticky-top mb-4" style="top: 20px;">
             <h5 class="fw-bold text-dark"><i class="bi bi-hourglass-split me-2"></i>Verification Pending</h5>
             <ul class="list-unstyled small text-secondary mt-3 mb-0">
                 <li class="mb-2">
@@ -290,6 +303,25 @@
             </ul>
           </div>
           {% endif %}
+
+          {% if not user.totpdevice_set.exists %}
+          <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+              <div class="d-flex align-items-center mb-3">
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                      <i class="bi bi-shield-lock-fill fs-4"></i>
+                  </div>
+                  <div>
+                      <h6 class="fw-bold mb-0">Account Security</h6>
+                      <small class="text-muted">Protect your account</small>
+                  </div>
+              </div>
+              <p class="small text-secondary mb-3">Enable 2-Factor Authentication (Google Auth) for better security.</p>
+              <a href="{% url 'myapp:setup_2fa' %}" class="btn btn-outline-primary rounded-pill w-100 fw-bold btn-sm">
+                  Enable 2FA
+              </a>
+          </div>
+          {% endif %}
+
         </div>
       </div>
 

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Confirm Google Sign-In | ComradeGigs{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="min-height: 70vh;">
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                
+                <div class="card-header bg-primary text-white text-center py-4 border-0">
+                    <div class="bg-white text-primary rounded-circle d-inline-flex p-3 mb-2 shadow-sm">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="30">
+                    </div>
+                    <h4 class="fw-bold mb-0">Confirm Sign-In</h4>
+                </div>
+
+                <div class="card-body p-5 text-center">
+                    {% if process == "connect" %}
+                        <h5 class="fw-bold mb-3">Connect Google to your Account</h5>
+                        <p class="text-secondary mb-4">You are about to link a new Google account to your existing ComradeGigs profile.</p>
+                    {% else %}
+                        <h5 class="fw-bold mb-3">Continue with Google</h5>
+                        <p class="text-secondary mb-4">You are about to sign in using your Google account: <strong>{{ object.provider.name }}</strong>.</p>
+                    {% endif %}
+
+                    <form method="post" class="d-grid gap-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm hover-lift">
+                            Continue <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                        
+                        <a href="{% url 'myapp:login' %}" class="btn btn-outline-secondary rounded-pill fw-bold border-0">
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3 border-0">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-lock-fill me-1"></i> Secure Connection via Google
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

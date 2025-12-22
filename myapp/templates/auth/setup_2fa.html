@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4 text-center p-4">
+                <h3 class="fw-bold mb-3"><i class="bi bi-shield-lock-fill text-success"></i> Secure Your Account</h3>
+                <p class="text-muted">1. Open <strong>Google Authenticator</strong> on your phone.<br>2. Scan the QR code below.</p>
+                
+                <div class="my-4">
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="img-fluid border p-2 rounded">
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="fw-bold">3. Enter the 6-digit code provided:</label>
+                        <input type="text" name="token" class="form-control form-control-lg text-center fw-bold" placeholder="000 000" maxlength="6" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold">Verify & Enable</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

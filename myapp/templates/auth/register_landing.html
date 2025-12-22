@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+{% load socialaccount %} {# Required for Google Login #}
 
 {% block title %}Join the Alliance | ComradeGigs{% endblock %}
 
 {% block content %}
-             <!-- reg landing page -->
 <section class="py-5 bg-light h-100 d-flex align-items-center">
   <div class="container">
     
@@ -13,7 +13,7 @@
       <p class="text-secondary">How do you want to interact with the platform?</p>
     </div>
 
-    <div class="row g-4 justify-content-center">
+    <div class="row g-4 justify-content-center mb-5">
       
       <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift text-center p-4">
@@ -62,7 +62,22 @@
 
     </div>
     
-    <div class="text-center mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="d-flex align-items-center mb-4">
+                <hr class="flex-grow-1">
+                <span class="px-3 text-muted small">Or join faster</span>
+                <hr class="flex-grow-1">
+            </div>
+            
+            <a href="{% provider_login_url 'google' %}" class="btn btn-white border shadow-sm rounded-pill px-4 fw-bold d-inline-flex align-items-center justify-content-center bg-white" style="min-width: 250px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20" class="me-3">
+                Sign in with Google
+            </a>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
       <p class="small">Already have an account? <a href="{% url 'myapp:login' %}" class="fw-bold text-decoration-none">Log In here</a></p>
     </div>
 

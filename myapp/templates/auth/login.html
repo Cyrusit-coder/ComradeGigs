@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+{% load socialaccount %} {# Required for Google Login #}
 
 {% block title %}Login | ComradeGigs{% endblock %}
 
 {% block content %}
-      <div class="container-fluid p-0">
+<div class="container-fluid p-0">
   <div class="row g-0" style="min-height: 85vh;">
     
     <div class="col-lg-6 d-none d-lg-block position-relative bg-dark">
@@ -28,7 +29,8 @@
 
         <form method="post" class="needs-validation">
           {% csrf_token %}
-              {% if form.non_field_errors %}
+          
+          {% if form.non_field_errors %}
             <div class="alert alert-danger d-flex align-items-center mb-4 rounded-3 shadow-sm" role="alert">
               <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
               <div>
@@ -41,7 +43,10 @@
 
           {% for field in form %}
           <div class="mb-4">
-            <label class="form-label fw-bold small text-uppercase text-secondary">{{ field.label }}</label>
+            <div class="d-flex justify-content-between align-items-center">
+                <label class="form-label fw-bold small text-uppercase text-secondary">{{ field.label }}</label>
+            </div>
+
             <div class="input-group">
               <span class="input-group-text bg-light border-end-0 text-muted">
                   {% if field.field.widget.input_type == 'password' %}
@@ -72,17 +77,38 @@
                 {% endfor %}
               </div>
             {% endif %}
+
+            {% if field.field.widget.input_type == 'password' %}
+            <div class="d-flex justify-content-end mt-2">
+                <a href="{% url 'password_reset' %}" class="small text-decoration-none fw-bold text-primary">
+                    Forgot Password?
+                </a>
+            </div>
+            {% endif %}
           </div>
           {% endfor %}
 
-          <div class="d-grid mt-5">
+          <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm hover-lift">
               Login to Dashboard <i class="bi bi-arrow-right ms-2"></i>
             </button>
           </div>
         </form>
 
-        <div class="text-center mt-5">
+        <div class="text-center mt-4">
+            <div class="d-flex align-items-center mb-3">
+                <hr class="flex-grow-1 opacity-25">
+                <span class="px-3 text-muted small">Or continue with</span>
+                <hr class="flex-grow-1 opacity-25">
+            </div>
+            
+            <a href="{% provider_login_url 'google' %}" class="btn btn-white border shadow-sm rounded-pill px-4 fw-bold d-inline-flex align-items-center justify-content-center bg-white hover-lift w-100">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20" class="me-3">
+                Sign in with Google
+            </a>
+        </div>
+
+        <div class="text-center mt-4">
           <p class="small text-secondary">
             New here? <a href="{% url 'myapp:register_landing' %}" class="text-decoration-none fw-bold text-primary">Create an Account</a>
           </p>

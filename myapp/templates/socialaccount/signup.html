@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Complete Registration | ComradeGigs{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="min-height: 80vh;">
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                
+                <div class="card-header bg-success text-white text-center py-4 border-0">
+                    <div class="bg-white text-success rounded-circle d-inline-flex p-3 mb-2 shadow-sm">
+                        <i class="bi bi-person-check-fill fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold mb-0">Almost There!</h4>
+                    <p class="mb-0 opacity-75 small">Confirm your details to finish signing up.</p>
+                </div>
+
+                <div class="card-body p-5">
+                    
+                    <p class="text-secondary text-center mb-4">
+                        You are about to use your <strong>Google Account</strong> to login to ComradeGigs. 
+                        Please verify your email address below.
+                    </p>
+
+                    <form class="signup d-grid gap-3" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger d-flex align-items-center rounded-3 mb-2">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>{{ form.non_field_errors }}</div>
+                        </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                        <div class="form-group">
+                            <label class="form-label fw-bold small text-secondary text-uppercase">{{ field.label }}</label>
+                            
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+                                <input type="{{ field.field.widget.input_type }}" 
+                                       name="{{ field.name }}" 
+                                       id="{{ field.id_for_label }}" 
+                                       class="form-control bg-light border-start-0 py-2" 
+                                       value="{{ field.value|default:'' }}"
+                                       placeholder="{{ field.label }}"
+                                       required>
+                            </div>
+
+                            {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm hover-lift">
+                                Complete Signup <i class="bi bi-check-lg ms-2"></i>
+                            </button>
+                        </div>
+                        
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3 border-0">
+                    <small class="text-muted">
+                        Already have an account? <a href="{% url 'myapp:login' %}" class="fw-bold text-success text-decoration-none">Log in here</a>
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

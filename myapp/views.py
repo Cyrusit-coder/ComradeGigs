@@ -1,5 +1,8 @@
 import json
 import traceback
+import qrcode
+import io
+import base64
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -10,6 +13,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
+from django.core.mail import send_mail  # Required for emails
+
+# --- 2FA IMPORTS ---
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from django_otp import devices_for_user
+
+# --- CONFIGURATION ---
+WHATSAPP_CHANNEL_URL = "https://whatsapp.com/channel/0029Vb7l5He3rZZdfyskEv0s"
 
 # Safe Import for M-Pesa
 try:
@@ -22,7 +33,8 @@ from .models import User, Job, Application, Donation, StudentProfile, Skill, Ski
 from .forms import (
     StudentRegisterForm, ClientRegisterForm, DonorRegisterForm, 
     JobForm, StudentProfileForm, DonationForm, EventForm, 
-    ApplicationForm, SiteUpdateForm, StudentIDUploadForm 
+    ApplicationForm, SiteUpdateForm, StudentIDUploadForm,
+    AdminProfileForm 
 )
 
 # 1. PUBLIC PAGES
@@ -33,13 +45,10 @@ def about(request):
     return render(request, 'pages/about.html')
 
 def events(request):
-    # FIXED: Changed 'date_time' back to 'date'
-    # We use '-date' to order them by date (Newest/Future first)
     events = Event.objects.all().order_by('-date')
     return render(request, 'pages/events.html', {'events': events})
 
 def contact(request):
-    # Optional: Handle form submission for contact page
     if request.method == 'POST':
         messages.success(request, "Message sent! We'll get back to you shortly.")
         return redirect('myapp:contact')
@@ -48,20 +57,27 @@ def contact(request):
 def faqs(request):
     return render(request, 'pages/faqs.html')
 
-# --- NEW: Terms & Privacy Views ---
 def terms_of_service(request):
     return render(request, 'pages/terms.html')
 
 def privacy_policy(request):
     return render(request, 'pages/privacy.html')
 
-# 2. AUTHENTICATION 
+# 2. AUTHENTICATION & SECURITY 
+
+# --- UPDATED LOGIN VIEW (Check for 2FA) ---
 def login_view(request):
     from django.contrib.auth.views import LoginView
     
     class CustomLoginView(LoginView):
         def get_success_url(self):
             user = self.request.user
+            
+            # 1. Check if user has a confirmed 2FA device
+            if user.totpdevice_set.filter(confirmed=True).exists():
+                return reverse('myapp:verify_2fa_login') # <--- Redirect to Code Entry
+            
+            # 2. Normal Redirects
             if user.role == 'student':
                 return reverse('myapp:student_dashboard')
             elif user.role == 'client':
@@ -79,6 +95,100 @@ def logout_view(request):
     logout(request)
     return redirect('myapp:home')
 
+# --- 2FA SETUP & VERIFY VIEWS ---
+@login_required
+def setup_2fa(request):
+    user = request.user
+    
+    # Get or Create a TOTP Device
+    device, created = TOTPDevice.objects.get_or_create(user=user, name='default')
+    
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        if device.verify_token(token):
+            device.confirmed = True
+            device.save()
+            messages.success(request, "2FA Security Enabled Successfully! 🔐")
+            
+            if user.role == 'student': return redirect('myapp:student_dashboard')
+            if user.role == 'client': return redirect('myapp:client_dashboard')
+            if user.role == 'donor': return redirect('myapp:donor_dashboard')
+            return redirect('myapp:home')
+        else:
+            messages.error(request, "Invalid Code. Please try again.")
+
+    if not device.confirmed:
+        otp_url = device.config_url
+        img = qrcode.make(otp_url)
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+        return render(request, 'auth/setup_2fa.html', {'qr_code': qr_code_base64})
+    
+    else:
+        messages.info(request, "2FA is already active on your account.")
+        return redirect('myapp:student_dashboard')
+
+def verify_2fa_login(request):
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        user = request.user
+        
+        device = user.totpdevice_set.filter(confirmed=True).first()
+        
+        if device and device.verify_token(token):
+            # Mark verified for session
+            from django_otp import login as otp_login
+            otp_login(request, device)
+            
+            messages.success(request, "Identity Verified. Welcome.")
+            
+            if user.role == 'student': return redirect('myapp:student_dashboard')
+            elif user.role == 'client': return redirect('myapp:client_dashboard')
+            elif user.role == 'donor': return redirect('myapp:donor_dashboard')
+            elif user.role == 'admin': return redirect('myapp:admin_dashboard')
+            return redirect('myapp:home')
+        else:
+            messages.error(request, "Invalid 2FA Code.")
+            
+    return render(request, 'auth/verify_2fa.html')
+
+# --- GOOGLE SOCIAL AUTH HANDLERS ---
+@login_required
+def social_auth_dispatch(request):
+    """Redirects Google logins to correct dashboard or role selection."""
+    user = request.user
+    
+    if user.role in ['student', 'client', 'donor', 'admin']:
+        if user.role == 'student': return redirect('myapp:student_dashboard')
+        elif user.role == 'client': return redirect('myapp:client_dashboard')
+        elif user.role == 'donor': return redirect('myapp:donor_dashboard')
+        elif user.role == 'admin': return redirect('myapp:admin_dashboard')
+        
+    return redirect('myapp:select_role')
+
+@login_required
+def select_role(request):
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        if role in ['student', 'client', 'donor']:
+            request.user.role = role
+            request.user.save()
+            
+            if role == 'student':
+                from .models import StudentProfile
+                StudentProfile.objects.get_or_create(user=request.user, defaults={
+                    'university': 'Pending', 'course': 'Pending'
+                })
+                messages.success(request, "Role assigned! Please complete your profile.")
+                return redirect('myapp:profile_edit')
+            
+            messages.success(request, "Account setup complete!")
+            return redirect('myapp:social_auth_dispatch')
+            
+    return render(request, 'auth/select_role.html')
+
+# --- REGISTRATION VIEWS ---
 def register_landing(request):
     return render(request, 'auth/register_landing.html')
 
@@ -87,8 +197,40 @@ def register_student(request):
         form = StudentRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            
+            # --- EMAIL ---
+            subject = f"Welcome to the Alliance | ComradeGigs 🚀"
+            message = f"""
+Dear {user.username},
+
+Welcome to ComradeGigs. We are thrilled to have you join our ecosystem.
+
+You have just taken a decisive step towards connecting with Kenya’s top verified talent and opportunities. Whether you are here to build your career or hire the best, you are now part of a community dedicated to innovation, integrity, and growth.
+
+What to expect next:
+1. Verified Access: Our team is reviewing your details to ensure a secure environment.
+2. Instant Connections: Browse active gigs or post your requirements immediately.
+3. Secure Transactions: All payments are protected and processed via M-Pesa.
+
+We look forward to cooperating with you to build something impactful.
+
+Let's get to work.
+
+Best regards,
+
+Cyrus Njeri
+Platform Administrator & System Architect
+ComradeGigs
+https://comradegigs.onrender.com
+            """
+            try:
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+            except Exception as e:
+                print(f"Email error: {e}")
+            # --- END EMAIL ---
+
             login(request, user)
-            messages.success(request, "Welcome back, Comrade! Profile created.")
+            messages.success(request, "Welcome back, Comrade! Check your email for a welcome message.")
             return redirect('myapp:student_dashboard')
     else:
         form = StudentRegisterForm()
@@ -99,8 +241,40 @@ def register_client(request):
         form = ClientRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+
+            # --- EMAIL ---
+            subject = f"Welcome Partner | ComradeGigs 🤝"
+            message = f"""
+Dear {user.username},
+
+Welcome to the ComradeGigs Business Alliance.
+
+Thank you for choosing to hire from Kenya's top pool of university talent. You are helping bridge the gap between education and industry.
+
+Important Next Steps:
+1. Account Verification: Your account is currently pending admin verification to ensure platform safety. This typically takes less than 2 hours.
+2. Posting Gigs: Once verified, you can post unlimited gigs and review applicants instantly.
+3. Secure Payments: All transactions are protected via our M-Pesa escrow system.
+
+We are committed to delivering quality results for your business needs.
+
+Let's get to work.
+
+Best regards,
+
+Cyrus Njeri
+Platform Administrator
+ComradeGigs
+https://comradegigs.onrender.com
+            """
+            try:
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+            except Exception as e:
+                print(f"Email error: {e}")
+            # --- END EMAIL ---
+
             login(request, user)
-            messages.success(request, "Client account created. Please wait for admin verification.")
+            messages.success(request, "Client account created. Check your email. Admin verification pending.")
             return redirect('myapp:client_dashboard')
     else:
         form = ClientRegisterForm()
@@ -111,8 +285,36 @@ def register_donor(request):
         form = DonorRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+
+            # --- EMAIL ---
+            subject = f"Thank You for Joining the Vision | ComradeGigs 🌍"
+            message = f"""
+Dear {user.username},
+
+Welcome to the ComradeGigs Alliance. We are deeply grateful for your presence here.
+
+Your decision to join as a supporter creates a direct pathway for students to earn dignity through work, not charity. You are empowering the next generation of Kenyan innovators.
+
+Transparency Promise:
+We ensure complete transparency on how contributions are used to verify student skills and facilitate safe transactions.
+
+Thank you for believing in the vision.
+
+Warm regards,
+
+Cyrus Njeri
+Platform Administrator
+ComradeGigs
+https://comradegigs.onrender.com
+            """
+            try:
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+            except Exception as e:
+                print(f"Email error: {e}")
+            # --- END EMAIL ---
+
             login(request, user)
-            messages.success(request, "Thank you for joining the alliance.")
+            messages.success(request, "Thank you for joining the alliance. Check your email for a welcome note.")
             return redirect('myapp:donor_dashboard')
     else:
         form = DonorRegisterForm()
@@ -130,7 +332,6 @@ def student_dashboard(request):
     earnings_data = request.user.assigned_jobs.filter(status='completed').aggregate(Sum('budget'))
     total_earnings = earnings_data['budget__sum'] or 0
     
-    # Get Announcements for Students
     site_updates = SiteUpdate.objects.filter(
         is_active=True, 
         audience__in=['all', 'student']
@@ -141,11 +342,11 @@ def student_dashboard(request):
         'active_jobs_count': active_jobs_list.count(),
         'active_jobs_list': active_jobs_list, 
         'total_earnings': total_earnings,
-        'site_updates': site_updates, 
+        'site_updates': site_updates,
+        'whatsapp_url': WHATSAPP_CHANNEL_URL,
     }
     return render(request, 'student/dashboard.html', context)
 
-# Student Upload ID View
 @login_required
 def upload_school_id(request):
     if request.user.role != 'student':
@@ -157,7 +358,6 @@ def upload_school_id(request):
         form = StudentIDUploadForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            # Clear rejection reason upon new upload
             profile.id_rejection_reason = None
             profile.save()
             
@@ -170,16 +370,11 @@ def upload_school_id(request):
 
 @login_required
 def job_list(request):
-    # Security Check: Restrict Access
     if request.user.role == 'student':
         profile = request.user.student_profile
-        
-        # 1. Check ID Verification
         if not profile.is_id_verified:
             messages.error(request, "Please upload your School ID and wait for verification first.")
             return redirect('myapp:student_dashboard')
-            
-        # 2. Check Skill Verification
         if not profile.is_skill_verified:
             messages.error(request, "You must pass a skill assessment to browse gigs.")
             return redirect('myapp:student_dashboard')
@@ -188,7 +383,6 @@ def job_list(request):
         messages.error(request, "Your account is pending verification.")
         return redirect('myapp:client_dashboard')
 
-    # If checks pass, show jobs
     jobs = Job.objects.filter(status='open').order_by('-created_at')
     query = request.GET.get('q')
     if query:
@@ -204,7 +398,6 @@ def job_detail(request, pk):
             messages.error(request, "Only Student accounts can apply.")
             return redirect('myapp:job_detail', pk=pk)
 
-        # Check verification
         if not request.user.student_profile.is_skill_verified:
              messages.error(request, "You must be verified to apply.")
              return redirect('myapp:job_detail', pk=pk)
@@ -330,7 +523,6 @@ def client_dashboard(request):
     ).count()
     completed_gigs_count = jobs.filter(status='completed').count()
     
-    # Get Announcements for Clients
     site_updates = SiteUpdate.objects.filter(
         is_active=True, 
         audience__in=['all', 'client']
@@ -341,13 +533,13 @@ def client_dashboard(request):
         'active_jobs_count': active_jobs_count,
         'applicants_reviewing_count': applicants_reviewing_count,
         'completed_gigs_count': completed_gigs_count,
-        'site_updates': site_updates, 
+        'site_updates': site_updates,
+        'whatsapp_url': WHATSAPP_CHANNEL_URL,
     }
     return render(request, 'client/dashboard.html', context)
 
 @login_required
 def job_create(request):
-    # Only allow verified clients or superusers
     if not request.user.is_superuser:
         if request.user.role != 'client' or not request.user.is_verified:
             messages.error(request, "Access Denied. Account verification required.")
@@ -390,27 +582,23 @@ def job_edit(request, pk):
         form = JobForm(instance=job)
     return render(request, 'client/job_edit.html', {'form': form, 'job': job})
 
-# --- UPDATED: Applicant Review (Handles Hire & Reject) ---
 @login_required
 def applicant_review(request, job_id):
     job = get_object_or_404(Job, pk=job_id, client=request.user)
     
     if request.method == 'POST':
         app_id = request.POST.get('applicant_id')
-        action = request.POST.get('action') # Check which button was pressed
+        action = request.POST.get('action') 
         application = get_object_or_404(Application, pk=app_id)
         
         if action == 'hire':
-            # Approve Application
             application.status = 'accepted'
             application.is_accepted = True
             application.save()
 
-            # Reject Others
             other_apps = job.applications.exclude(id=app_id)
             other_apps.update(status='rejected', is_rejected=True)
 
-            # Update Job
             job.assigned_to = application.student
             job.status = 'assigned'
             job.save()
@@ -419,13 +607,11 @@ def applicant_review(request, job_id):
             return redirect('myapp:client_dashboard')
             
         elif action == 'reject':
-            # Reject specific applicant
             application.status = 'rejected'
             application.is_rejected = True
             application.save()
             
             messages.warning(request, "Applicant rejected.")
-            # Reload page to see remaining applicants
             return redirect('myapp:applicant_review', job_id=job.id)
 
     return render(request, 'client/applicant_review.html', {'job': job})
@@ -450,17 +636,17 @@ def pay_for_job(request, job_id):
             status='PENDING'
         )
 
-        base_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000')
-        callback_url = f"{base_url}/mpesa/confirmation" if "confirmation" not in base_url else base_url
-
+        # FIXED: Removed 'callback_url' to prevent TypeError
         if stk_push:
-            resp = stk_push(
-                phone_number=phone,
-                amount=amount,
-                account_reference=f"JOB-{job.id}",
-                transaction_desc=f"Payment for {job.title}",
-                callback_url=callback_url,
-            )
+            try:
+                resp = stk_push(
+                    phone_number=phone,
+                    amount=amount,
+                    account_reference=f"JOB-{job.id}",
+                    transaction_desc=f"Payment for {job.title}"
+                )
+            except TypeError as e:
+                resp = {"error": f"Internal Error: {str(e)}"}
         else:
             resp = {"error": "M-Pesa library not loaded"}
 
@@ -498,7 +684,6 @@ def donor_dashboard(request):
     total_contributed = total_data['amount__sum'] or 0
     comrades_supported = int(total_contributed / 500)
     
-    # Get Announcements for Donors
     site_updates = SiteUpdate.objects.filter(
         is_active=True, 
         audience__in=['all', 'donor']
@@ -508,7 +693,8 @@ def donor_dashboard(request):
         'donations': donations,
         'total_contributed': total_contributed,
         'comrades_supported': comrades_supported,
-        'site_updates': site_updates, 
+        'site_updates': site_updates,
+        'whatsapp_url': WHATSAPP_CHANNEL_URL,
     }
     return render(request, 'donor/dashboard.html', context)
 
@@ -518,12 +704,32 @@ def donate(request):
         amount = request.POST.get('amount')
         phone = request.POST.get('phone')
 
+        # --- STEP 1: Auto-Correct Phone Number ---
+        if phone:
+            phone = str(phone).strip().replace(" ", "").replace("+", "")
+            if phone.startswith("0"):
+                phone = "254" + phone[1:]
+        
+        # --- STEP 2: Ensure Amount is a Number ---
+        try:
+            amount = int(float(amount))
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid amount.")
+            return redirect('myapp:donor_dashboard')
+
+        # --- STEP 3: Check if Settings are Loaded ---
+        if not settings.MPESA_SHORTCODE:
+            messages.error(request, "System Error: M-Pesa Shortcode is missing in settings.")
+            return redirect('myapp:donor_dashboard')
+
+        # 1. Create Donation Record
         donation = Donation.objects.create(
             donor=request.user,
             amount=amount,
             is_paid=False
         )
 
+        # 2. Create Payment Record
         payment = Payment.objects.create(
             payer=request.user,
             beneficiary=None, 
@@ -533,24 +739,49 @@ def donate(request):
             status='PENDING'
         )
 
-        base_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000')
-        callback_url = f"{base_url}/mpesa/confirmation" if "confirmation" not in base_url else base_url
-
+        # 3. Trigger M-Pesa STK Push
         if stk_push:
-            resp = stk_push(
-                phone_number=phone,
-                amount=amount,
-                account_reference=f"DON-{donation.id}",
-                transaction_desc="ComradeGigs Donation",
-                callback_url=callback_url,
-            )
+            try:
+                # --- FIX: FORCE REMOVE SPACES FROM SETTINGS ---
+                # Safaricom rejects URLs with spaces. We clean the setting in memory
+                # so the library uses the clean version automatically.
+                if hasattr(settings, 'MPESA_CALLBACK_URL'):
+                    settings.MPESA_CALLBACK_URL = str(settings.MPESA_CALLBACK_URL).strip()
+
+                # --- DEBUG PRINT ---
+                print("--- DEBUG INFO ---")
+                print(f"Shortcode: {settings.MPESA_SHORTCODE}")
+                print(f"Clean Callback URL: '{settings.MPESA_CALLBACK_URL}'") # Verify spaces are gone
+                print(f"Phone: {phone}")
+                print("------------------")
+
+                # --- STEP 4: STRICT TRUNCATION ---
+                # AccountReference: Max 12 chars
+                ref = f"DON-{donation.id}"[:12] 
+                
+                # TransactionDesc: Max 13 chars
+                desc = "Donation" 
+
+                # Note: We do NOT pass 'callback_url' as an argument here 
+                # because your library gave a TypeError previously. 
+                # It will read the clean URL from settings.MPESA_CALLBACK_URL.
+                resp = stk_push(
+                    phone_number=phone,
+                    amount=amount,
+                    account_reference=ref,
+                    transaction_desc=desc
+                )
+            except Exception as e:
+                print(f"STK Push Crash: {e}")
+                resp = {"error": str(e)}
         else:
             resp = {"error": "M-Pesa library not loaded"}
 
+        # 4. Handle Response
         if "ResponseCode" in resp and resp["ResponseCode"] == "0":
             payment.checkout_request_id = resp.get("CheckoutRequestID")
             payment.save()
-            messages.success(request, f"STK Push sent to {phone}. Please confirm payment.")
+            messages.success(request, f"STK Push sent to {phone}. Please enter your PIN.")
             
             return render(
                 request,
@@ -558,14 +789,15 @@ def donate(request):
                 {'donation': donation, 'payment': payment, 'phone_number': phone}
             )
         else:
-            err_msg = resp.get('errorMessage') or resp.get('error') or "Unknown error"
+            # Log the full error to terminal for debugging
+            print(f"M-Pesa Failed Response: {resp}")
+            err_msg = resp.get('errorMessage') or resp.get('error') or "Transaction Failed"
             payment.status = 'FAILED'
             payment.save()
-            messages.error(request, f"Donation Failed: {err_msg}")
+            messages.error(request, f"M-Pesa Error: {err_msg}")
             return redirect('myapp:donor_dashboard')
 
-    return render(request, 'donor/donate_form.html') 
-
+    return render(request, 'donor/donate_form.html')
 @login_required
 def donate_success(request):
     last_donation = Donation.objects.filter(
@@ -573,6 +805,18 @@ def donate_success(request):
         is_paid=True
     ).order_by('-date').first()
     return render(request, 'donor/donate_success.html', {'donation': last_donation})
+
+# --- NEW: PAYMENT STATUS API (For Polling) ---
+def check_payment_status(request, payment_id):
+    """
+    Checks if a specific payment has been marked as SUCCESS.
+    Frontend calls this every few seconds.
+    """
+    try:
+        payment = Payment.objects.get(id=payment_id)
+        return JsonResponse({'status': payment.status})
+    except Payment.DoesNotExist:
+        return JsonResponse({'status': 'ERROR'}, status=404)
 
 # 6. M-PESA CALLBACK 
 @csrf_exempt
@@ -616,7 +860,6 @@ def mpesa_confirmation(request):
 
             if payment.purpose == 'JOB' and payment.job:
                 job = payment.job
-                # Job is now paid/completed
                 job.status = 'completed'
                 job.save()
 
@@ -629,7 +872,6 @@ def mpesa_confirmation(request):
     except Exception as e:
         traceback.print_exc()
         return HttpResponse(status=400)
-
 # 7. ADMIN VIEWS 
 @login_required
 def admin_dashboard(request):
@@ -638,7 +880,6 @@ def admin_dashboard(request):
     
     my_posted_jobs = Job.objects.filter(client=request.user).order_by('-created_at')
     
-    # Platform Stats
     total_users_count = User.objects.count()
     pending_gigs_count = Job.objects.filter(status='review').count()
     pending_assessments_count = SkillSubmission.objects.filter(status='pending').count()
@@ -650,7 +891,6 @@ def admin_dashboard(request):
 
     pending_apps_count = Application.objects.filter(is_accepted=False, is_rejected=False).count()
     
-    # FIXED: Changed 'date_time' back to 'date'
     events = Event.objects.all().order_by('date')
     site_updates = SiteUpdate.objects.filter(is_active=True).order_by('-created_at')
 
@@ -663,6 +903,7 @@ def admin_dashboard(request):
         'my_posted_jobs': my_posted_jobs,
         'events': events,
         'site_updates': site_updates,
+        'whatsapp_url': WHATSAPP_CHANNEL_URL,
     }
     
     return render(request, 'custom_admin/dashboard.html', context)
@@ -718,7 +959,6 @@ def admin_ban_user(request, user_id):
     user_to_mod.save()
     return redirect('myapp:admin_users')
 
-# Admin Verify User (Handles Students, Clients, Donors)
 @login_required
 def admin_verify_user(request, user_id):
     if not request.user.is_superuser:
@@ -726,7 +966,6 @@ def admin_verify_user(request, user_id):
         
     user_to_verify = get_object_or_404(User, pk=user_id)
     
-    # 1. Student Verification Logic (Identity)
     if user_to_verify.role == 'student':
         profile = user_to_verify.student_profile
         if profile.is_id_verified:
@@ -737,7 +976,6 @@ def admin_verify_user(request, user_id):
             messages.success(request, f"Student {user_to_verify.username} ID Verified.")
         profile.save()
         
-    # 2. Client/Donor Verification Logic (Account)
     else:
         if user_to_verify.is_verified:
             user_to_verify.is_verified = False
@@ -749,7 +987,6 @@ def admin_verify_user(request, user_id):
         
     return redirect('myapp:admin_users')
 
-# --- NEW: Admin Reject ID Logic ---
 @login_required
 def admin_reject_id(request, user_id):
     if not request.user.is_superuser:
@@ -760,15 +997,11 @@ def admin_reject_id(request, user_id):
     if user_to_reject.role == 'student':
         profile = user_to_reject.student_profile
         
-        # 1. Set Unverified
         profile.is_id_verified = False
-        
-        # 2. Set the Reason
         profile.id_rejection_reason = "Your ID was blurry or invalid. Please upload a clearer photo."
         
-        # 3. CRITICAL FIX: Delete the bad image so the Admin knows it's gone
         if profile.school_id_image:
-            profile.school_id_image.delete()  # This removes the file
+            profile.school_id_image.delete()
             
         profile.save()
         messages.warning(request, f"ID Rejected for {user_to_reject.username}. Image removed.")
@@ -807,7 +1040,6 @@ def admin_approve_skill(request, submission_id):
             skill_obj, created = Skill.objects.get_or_create(name=submission.skill_name)
             profile.skills.add(skill_obj)
             
-            # Verify Skill Status
             profile.is_skill_verified = True
             profile.badges_earned += 1
             profile.save()
@@ -924,7 +1156,6 @@ def event_edit(request, pk):
         
     return render(request, 'custom_admin/event_create.html', {'form': form})
 
-# --- Site Update Creation ---
 @login_required
 def create_site_update(request):
     if not request.user.is_superuser:
@@ -939,5 +1170,23 @@ def create_site_update(request):
     else:
         form = SiteUpdateForm()
     
-    # Renders the new template instead of just redirecting
     return render(request, 'custom_admin/create_update.html', {'form': form})
+
+# 8. ADMIN PROFILE (NEW)
+from .forms import AdminProfileForm
+
+@login_required
+def admin_profile(request):
+    if not request.user.is_superuser:
+        return redirect('myapp:home')
+        
+    if request.method == 'POST':
+        form = AdminProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Admin Profile updated successfully! You look official now. 👔")
+            return redirect('myapp:admin_profile')
+    else:
+        form = AdminProfileForm(instance=request.user)
+        
+    return render(request, 'custom_admin/profile.html', {'form': form})

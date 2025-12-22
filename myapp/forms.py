@@ -163,3 +163,16 @@ class StudentIDUploadForm(forms.ModelForm):
         widgets = {
             'school_id_image': forms.FileInput(attrs={'class': 'form-control form-control-lg', 'accept': 'image/*'}),
         }
+
+# --- ADMIN PROFILE FORM ---
+class AdminProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'profile_image']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control rounded-pill', 'placeholder': 'First Name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control rounded-pill', 'placeholder': 'Last Name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control rounded-pill', 'placeholder': 'Official Email'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control rounded-pill', 'placeholder': 'WhatsApp Number'}),
+            'profile_image': forms.FileInput(attrs={'class': 'form-control rounded-pill'}),
+        }

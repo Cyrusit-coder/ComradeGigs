@@ -38,6 +38,19 @@
       </div>
     </div>
 
+    {% if whatsapp_url %}
+    <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-whatsapp fs-3 me-3"></i>
+        <div>
+            <h6 class="fw-bold mb-1">Business Support Channel</h6>
+            <p class="mb-0 small">Get direct support and platform updates via WhatsApp.</p>
+        </div>
+        <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success rounded-pill fw-bold ms-auto px-4">
+            Join Channel
+        </a>
+    </div>
+    {% endif %}
+
     {% if site_updates %}
     <div class="row mb-4" id="notifications-container">
         <div class="col-12">
@@ -119,6 +132,25 @@
         </div>
       </div>
     </div>
+
+    {% if not user.totpdevice_set.exists %}
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-5">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3">
+                    <i class="bi bi-shield-lock-fill fs-3"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Secure Your Client Account</h5>
+                    <p class="text-secondary mb-0 small">Protect your funds and hiring data by enabling 2-Factor Authentication (Google Auth).</p>
+                </div>
+            </div>
+            <a href="{% url 'myapp:setup_2fa' %}" class="btn btn-outline-primary rounded-pill fw-bold px-4">
+                Enable 2FA Now
+            </a>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
       <div class="card-header bg-white py-3 px-4 border-bottom">
@@ -203,9 +235,9 @@
 
                   {% if job.status != 'assigned' %}
                   <a href="{% url 'myapp:job_delete' job.id %}" 
-                     class="btn btn-outline-danger btn-sm rounded-circle ms-1" 
-                     title="Delete Gig"
-                     onclick="return confirm('Are you sure you want to delete this gig? This action cannot be undone.');">
+                      class="btn btn-outline-danger btn-sm rounded-circle ms-1" 
+                      title="Delete Gig"
+                      onclick="return confirm('Are you sure you want to delete this gig? This action cannot be undone.');">
                     <i class="bi bi-trash3-fill"></i>
                   </a>
                   {% endif %}
