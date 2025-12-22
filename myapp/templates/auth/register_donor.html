@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+{% load socialaccount %} {# Required for Google Login #}
 
 {% block title %}Donor Sign Up | ComradeGigs{% endblock %}
 
 {% block content %}
-    <div class="container py-5">
+<div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-5 col-md-7">
       
@@ -19,7 +20,19 @@
         </div>
 
         <div class="card-body p-5">
-          <form method="post" class="row g-3">
+          
+          <div class="d-grid mb-3">
+            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-dark btn-lg rounded-pill shadow-sm hover-lift d-flex align-items-center justify-content-center">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="20" height="20" class="me-2">
+              <span class="fw-bold small">Sign up with Google</span>
+            </a>
+          </div>
+
+          <div class="text-center text-muted mb-3 position-relative">
+            <hr class="position-absolute w-100 top-50 start-0 m-0" style="z-index: 1;">
+            <span class="bg-white px-2 position-relative text-secondary small" style="z-index: 2;">OR</span>
+          </div>
+          <form method="post" class="row g-3" enctype="multipart/form-data">
             {% csrf_token %}
             
             {% if form.non_field_errors %}
@@ -40,25 +53,26 @@
                 <label class="form-label fw-bold small text-secondary">{{ field.label }}</label>
                 
                 <div class="input-group">
-                  {% if field.field.widget.input_type == 'password' %}
+                  {# Password Fields #}
+                  {% if 'password' in field.name %}
                       <input type="password" 
                              name="{{ field.name }}" 
                              id="{{ field.id_for_label }}"
                              class="form-control bg-light border-0 py-2"
-                             {% if field.field.required %}required{% endif %}
-                             value="{{ field.value|default:'' }}">
+                             required>
                       
                       <span class="input-group-text bg-light border-0 text-secondary" style="cursor: pointer;" onclick="togglePassword('{{ field.id_for_label }}', this)">
                           <i class="bi bi-eye"></i>
                       </span>
 
+                  {# Other Fields #}
                   {% else %}
-                      <input type="{{ field.field.widget.input_type }}" 
+                      <input type="{{ field.field.widget.input_type|default:'text' }}" 
                              name="{{ field.name }}" 
                              id="{{ field.id_for_label }}"
                              class="form-control bg-light border-0 py-2"
-                             {% if field.field.required %}required{% endif %}
-                             value="{{ field.value|default:'' }}">
+                             value="{{ field.value|default:'' }}"
+                             required>
                   {% endif %}
                 </div>
 
