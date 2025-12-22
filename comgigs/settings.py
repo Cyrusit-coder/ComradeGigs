@@ -14,7 +14,6 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Try to get it from environment, fall back to insecure one for dev
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-t257&6zk)05-4i!=p(s=6z522ms%az6d)tl5uer06fx-=zwz5y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -130,7 +129,7 @@ LOGIN_REDIRECT_URL = 'myapp:social_auth_dispatch'
 LOGOUT_REDIRECT_URL = 'myapp:home'
 AUTH_USER_MODEL = 'myapp.User' 
 
-# --- STATIC & MEDIA FILES (Fixed & Cleaned) ---
+# --- STATIC & MEDIA FILES ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'myapp/static')]
@@ -145,7 +144,7 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# New Django Storage Configuration (Replaces deprecated settings)
+# New Django Storage Configuration
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -156,8 +155,7 @@ STORAGES = {
 }
 
 # Email Configuration
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Use for testing (prints to console)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # Use for real emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -166,7 +164,7 @@ EMAIL_HOST_USER = 'cyrusnjeri04@gmail.com'
 EMAIL_HOST_PASSWORD = 'ryud gkda ovhu dznl' 
 DEFAULT_FROM_EMAIL = 'cyrusnjeri04@gmail.com'
 
-# --- M-PESA CONFIGURATION (Smart Switch) ---
+# --- M-PESA CONFIGURATION ---
 MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
 MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE")
@@ -180,10 +178,10 @@ if RENDER_EXTERNAL_HOSTNAME:
     MPESA_CALLBACK_URL = f'https://{RENDER_EXTERNAL_HOSTNAME}'
 else:
     # WE ARE ON LOCALHOST (Use Ngrok)
-    # REPLACE THIS with your current Ngrok URL every time you restart Ngrok
-    MPESA_CALLBACK_URL = '  https://anthropolatric-elena-nonmonogamously.ngrok-free.dev' 
+    # FIX: Removed the spaces at the start of the string
+    MPESA_CALLBACK_URL = 'https://anthropolatric-elena-nonmonogamously.ngrok-free.dev' 
 
-CALLBACK_URL = MPESA_CALLBACK_URL # Alias for safety
+CALLBACK_URL = MPESA_CALLBACK_URL 
 
 # --- AUTHENTICATION BACKENDS ---
 AUTHENTICATION_BACKENDS = [
@@ -191,29 +189,26 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend', # Google login
 ]
 
-# --- GOOGLE AUTH SETTINGS (Django-Allauth) ---
+# --- GOOGLE AUTH SETTINGS ---
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
         'APP': {
-    'client_id': os.getenv('GOOGLE_CLIENT_ID'),     # Loaded from .env
-    'secret': os.getenv('GOOGLE_CLIENT_SECRET'),    # Loaded from .env
-    'key': ''
-}
+            'client_id': os.getenv('GOOGLE_CLIENT_ID'),     # Loaded from .env
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),    # Loaded from .env
+            'key': ''
         }
     }
+}
 
-
-# --- ALLAUTH CONFIGURATION (Updated) ---
-# Specifies that users log in with their email address
+# --- ALLAUTH CONFIGURATION ---
 ACCOUNT_LOGIN_METHODS = {'email'}
 
-# Defines the fields required during signup ('*' means required)
 ACCOUNT_SIGNUP_FIELDS = [
-    'email*',       # Email is required
-    'password1*',   # Password is required
-    'password2*',   # Password confirmation is required
+    'email*',       
+    'password1*',   
+    'password2*',   
 ]
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # Options: "mandatory", "optional", "none"
+ACCOUNT_EMAIL_VERIFICATION = 'none'
