@@ -13,7 +13,10 @@ ROLE_CHOICES = (
 # 2. Custom User Model
 class User(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
-    is_verified = models.BooleanField(default=False) # Used for Admin verification of Clients/Donors
+    
+    # FIX: This is just a field now. No conflicting function.
+    is_verified = models.BooleanField(default=False) 
+    
     phone_number = models.CharField(max_length=15, blank=True, null=True, help_text="Required for M-Pesa")
     profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
 
@@ -28,7 +31,7 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
-# 4. Student Profile (UPDATED WITH REJECTION LOGIC)
+# 4. Student Profile
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     
@@ -52,7 +55,7 @@ class StudentProfile(models.Model):
     school_id_image = models.ImageField(upload_to='student_ids/', blank=True, null=True)
     is_id_verified = models.BooleanField(default=False)
     
-    # --- NEW: Rejection Reason Field ---
+    # Rejection Reason
     id_rejection_reason = models.TextField(blank=True, null=True, help_text="Reason for rejecting the ID")
 
     def __str__(self):
@@ -98,7 +101,7 @@ class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_applications')
     
-    # Updated Fields for Proposal & Files
+    # Proposal & Files
     proposal = models.TextField(help_text="Short message to the client") 
     bid_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
@@ -109,7 +112,6 @@ class Application(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     
-    # Legacy fields (optional, but kept for compatibility)
     is_accepted = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
 
