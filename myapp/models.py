@@ -14,8 +14,9 @@ ROLE_CHOICES = (
 class User(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
     
-    # FIX: This is just a field now. No conflicting function.
-    is_verified = models.BooleanField(default=False) 
+    # FIX: Renamed from 'is_verified' to 'is_account_verified' 
+    # This prevents the crash with the 2FA (django-otp) system.
+    is_account_verified = models.BooleanField(default=False) 
     
     phone_number = models.CharField(max_length=15, blank=True, null=True, help_text="Required for M-Pesa")
     profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
@@ -214,6 +215,3 @@ class SiteUpdate(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_audience_display()})"
-
-# Final fix for verified function conflict
-# Force update: Removing conflicting function
