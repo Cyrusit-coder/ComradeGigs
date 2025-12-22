@@ -154,16 +154,18 @@ STORAGES = {
     },
 }
 
+
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465  # Changed from 587
+EMAIL_USE_TLS = False  # Changed from True
+EMAIL_USE_SSL = True   # Changed from False (Required for Port 465)
 EMAIL_HOST_USER = 'cyrusnjeri04@gmail.com'
-EMAIL_HOST_PASSWORD = 'ryud gkda ovhu dznl' 
-DEFAULT_FROM_EMAIL = 'cyrusnjeri04@gmail.com'
 
+# SECURITY: Load password from Environment Variable so it doesn't get blocked
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD') 
+DEFAULT_FROM_EMAIL = 'cyrusnjeri04@gmail.com'
 # --- M-PESA CONFIGURATION ---
 MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
