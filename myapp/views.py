@@ -110,9 +110,12 @@ def setup_2fa(request):
             device.save()
             messages.success(request, "2FA Security Enabled Successfully! 🔐")
             
-            if user.role == 'student': return redirect('myapp:student_dashboard')
-            if user.role == 'client': return redirect('myapp:client_dashboard')
-            if user.role == 'donor': return redirect('myapp:donor_dashboard')
+            if user.role == 'student': 
+                return redirect('myapp:student_dashboard')
+            if user.role == 'client': 
+                return redirect('myapp:client_dashboard')
+            if user.role == 'donor': 
+                return redirect('myapp:donor_dashboard')
             return redirect('myapp:home')
         else:
             messages.error(request, "Invalid Code. Please try again.")
@@ -143,10 +146,14 @@ def verify_2fa_login(request):
             
             messages.success(request, "Identity Verified. Welcome.")
             
-            if user.role == 'student': return redirect('myapp:student_dashboard')
-            elif user.role == 'client': return redirect('myapp:client_dashboard')
-            elif user.role == 'donor': return redirect('myapp:donor_dashboard')
-            elif user.role == 'admin': return redirect('myapp:admin_dashboard')
+            if user.role == 'student': 
+                return redirect('myapp:student_dashboard')
+            elif user.role == 'client': 
+                return redirect('myapp:client_dashboard')
+            elif user.role == 'donor': 
+                return redirect('myapp:donor_dashboard')
+            elif user.role == 'admin': 
+                return redirect('myapp:admin_dashboard')
             return redirect('myapp:home')
         else:
             messages.error(request, "Invalid 2FA Code.")
@@ -200,9 +207,15 @@ def select_role(request):
                 
                 subject = f"Welcome to the Alliance | ComradeGigs 🚀"
                 message = f"""Dear {user.username},\n\nWelcome to ComradeGigs. You have joined as a STUDENT.\nWe are reviewing your details.\n\nBest,\nComradeGigs Team"""
+                
+                # --- EMAIL DEBUG START ---
                 try:
-                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
-                except: pass
+                    print(f"Attempting to send email to {user.email}...")
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+                    print("Email sent successfully!")
+                except Exception as e:
+                    print(f"EMAIL ERROR: {e}")
+                # --- EMAIL DEBUG END ---
 
                 messages.success(request, "Role assigned! Please complete your profile.")
                 return redirect('myapp:profile_edit')
@@ -211,8 +224,11 @@ def select_role(request):
                 subject = f"Welcome Partner | ComradeGigs 🤝"
                 message = f"""Dear {user.username},\n\nWelcome to the ComradeGigs Business Alliance.\nYour Client account is pending admin verification.\n\nBest,\nComradeGigs Team"""
                 try:
-                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
-                except: pass
+                    print(f"Attempting to send email to {user.email}...")
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+                    print("Email sent successfully!")
+                except Exception as e:
+                    print(f"EMAIL ERROR: {e}")
                 
                 messages.success(request, "Client account setup! Check your email.")
                 return redirect('myapp:client_dashboard')
@@ -221,8 +237,11 @@ def select_role(request):
                 subject = f"Thank You for Joining | ComradeGigs 🌍"
                 message = f"""Dear {user.username},\n\nThank you for joining as a DONOR.\nYour support changes lives.\n\nBest,\nComradeGigs Team"""
                 try:
-                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
-                except: pass
+                    print(f"Attempting to send email to {user.email}...")
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+                    print("Email sent successfully!")
+                except Exception as e:
+                    print(f"EMAIL ERROR: {e}")
                 
                 messages.success(request, "Donor account setup! Welcome.")
                 return redirect('myapp:donor_dashboard')
@@ -265,7 +284,9 @@ ComradeGigs
 https://comradegigs.onrender.com
             """
             try:
-                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+                print(f"Attempting to send email to {user.email}...")
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+                print("Email sent successfully!")
             except Exception as e:
                 print(f"Email error: {e}")
             # --- END EMAIL ---
@@ -309,7 +330,9 @@ ComradeGigs
 https://comradegigs.onrender.com
             """
             try:
-                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+                print(f"Attempting to send email to {user.email}...")
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+                print("Email sent successfully!")
             except Exception as e:
                 print(f"Email error: {e}")
             # --- END EMAIL ---
@@ -349,7 +372,9 @@ ComradeGigs
 https://comradegigs.onrender.com
             """
             try:
-                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+                print(f"Attempting to send email to {user.email}...")
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+                print("Email sent successfully!")
             except Exception as e:
                 print(f"Email error: {e}")
             # --- END EMAIL ---
@@ -420,7 +445,8 @@ def job_list(request):
             messages.error(request, "You must pass a skill assessment to browse gigs.")
             return redirect('myapp:student_dashboard')
 
-    elif request.user.role == 'client' and not request.user.is_verified:
+    # FIX: Use 'is_account_verified' here!
+    elif request.user.role == 'client' and not request.user.is_account_verified:
         messages.error(request, "Your account is pending verification.")
         return redirect('myapp:client_dashboard')
 
@@ -582,7 +608,8 @@ def client_dashboard(request):
 @login_required
 def job_create(request):
     if not request.user.is_superuser:
-        if request.user.role != 'client' or not request.user.is_verified:
+        # FIX: Use 'is_account_verified' here!
+        if request.user.role != 'client' or not request.user.is_account_verified:
             messages.error(request, "Access Denied. Account verification required.")
             return redirect('myapp:client_dashboard')
 
@@ -1019,11 +1046,12 @@ def admin_verify_user(request, user_id):
         profile.save()
         
     else:
-        if user_to_verify.is_verified:
-            user_to_verify.is_verified = False
+        # FIX: Use 'is_account_verified' here!
+        if user_to_verify.is_account_verified:
+            user_to_verify.is_account_verified = False
             messages.warning(request, f"{user_to_verify.username} unverified.")
         else:
-            user_to_verify.is_verified = True
+            user_to_verify.is_account_verified = True
             messages.success(request, f"{user_to_verify.username} successfully verified.")
         user_to_verify.save()
         
