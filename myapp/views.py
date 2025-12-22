@@ -153,38 +153,79 @@ def verify_2fa_login(request):
             
     return render(request, 'auth/verify_2fa.html')
 
-# --- GOOGLE SOCIAL AUTH HANDLERS ---
+# --- GOOGLE SOCIAL AUTH HANDLERS (UPDATED) ---
 @login_required
 def social_auth_dispatch(request):
-    """Redirects Google logins to correct dashboard or role selection."""
+    """
+    Redirects Google logins.
+    If the user has a role but NO profile (fresh Google signup), force them to choose a role.
+    """
     user = request.user
     
-    if user.role in ['student', 'client', 'donor', 'admin']:
-        if user.role == 'student': return redirect('myapp:student_dashboard')
-        elif user.role == 'client': return redirect('myapp:client_dashboard')
-        elif user.role == 'donor': return redirect('myapp:donor_dashboard')
-        elif user.role == 'admin': return redirect('myapp:admin_dashboard')
+    # Check if this is a "Fake" student (Default role, but no profile data)
+    if user.role == 'student':
+        # If they don't have a StudentProfile object yet, they are new.
+        if not hasattr(user, 'student_profile'):
+             return redirect('myapp:select_role')
+        return redirect('myapp:student_dashboard')
+
+    elif user.role == 'client':
+        return redirect('myapp:client_dashboard')
         
+    elif user.role == 'donor':
+        return redirect('myapp:donor_dashboard')
+        
+    elif user.role == 'admin':
+        return redirect('myapp:admin_dashboard')
+        
+    # If no role, go to selection
     return redirect('myapp:select_role')
 
 @login_required
 def select_role(request):
     if request.method == 'POST':
         role = request.POST.get('role')
+        user = request.user
+        
         if role in ['student', 'client', 'donor']:
-            request.user.role = role
-            request.user.save()
+            user.role = role
+            user.save()
             
+            # --- EMAIL LOGIC MOVED HERE (So Google Users get it too) ---
             if role == 'student':
                 from .models import StudentProfile
-                StudentProfile.objects.get_or_create(user=request.user, defaults={
+                StudentProfile.objects.get_or_create(user=user, defaults={
                     'university': 'Pending', 'course': 'Pending'
                 })
+                
+                subject = f"Welcome to the Alliance | ComradeGigs 🚀"
+                message = f"""Dear {user.username},\n\nWelcome to ComradeGigs. You have joined as a STUDENT.\nWe are reviewing your details.\n\nBest,\nComradeGigs Team"""
+                try:
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+                except: pass
+
                 messages.success(request, "Role assigned! Please complete your profile.")
                 return redirect('myapp:profile_edit')
             
-            messages.success(request, "Account setup complete!")
-            return redirect('myapp:social_auth_dispatch')
+            elif role == 'client':
+                subject = f"Welcome Partner | ComradeGigs 🤝"
+                message = f"""Dear {user.username},\n\nWelcome to the ComradeGigs Business Alliance.\nYour Client account is pending admin verification.\n\nBest,\nComradeGigs Team"""
+                try:
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+                except: pass
+                
+                messages.success(request, "Client account setup! Check your email.")
+                return redirect('myapp:client_dashboard')
+
+            elif role == 'donor':
+                subject = f"Thank You for Joining | ComradeGigs 🌍"
+                message = f"""Dear {user.username},\n\nThank you for joining as a DONOR.\nYour support changes lives.\n\nBest,\nComradeGigs Team"""
+                try:
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=True)
+                except: pass
+                
+                messages.success(request, "Donor account setup! Welcome.")
+                return redirect('myapp:donor_dashboard')
             
     return render(request, 'auth/select_role.html')
 
@@ -798,6 +839,7 @@ def donate(request):
             return redirect('myapp:donor_dashboard')
 
     return render(request, 'donor/donate_form.html')
+
 @login_required
 def donate_success(request):
     last_donation = Donation.objects.filter(
